@@ -1,0 +1,16 @@
+# cargo
+debug/
+target/
+
+# rustfmt
+**/*.rs.bk
+
+# msvc rustc
+*.pdb
+
+# env files
+.env
+*.env
+
+# config for spotify cli
+.spotify_cache
