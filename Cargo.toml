@@ -13,8 +13,9 @@ publish = false
 
 [dependencies]
 anyhow = "1.0.66"
+chrono-english = "0.1.7"
 # date_time_parser = "0.1.1"
-serenity = { version = "0.11.5",default-features = false, features = ["client", "gateway", "model", "rustls_backend"]}
+serenity = { version = "0.11.5", default-features = false, features = ["builder", "cache", "client", "gateway","http", "model","utils", "rustls_backend"]}
 simple_logger = "4.0.0"
 thiserror = "1.0.37"
 tokio = { version = "1.22.0", features = ["full"] }
