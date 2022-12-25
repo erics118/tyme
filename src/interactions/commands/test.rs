@@ -7,7 +7,11 @@ use serenity::{
     prelude::*,
 };
 
-pub async fn run<'a>(ctx: &'a Context, command: &'a ApplicationCommandInteraction) -> Result<()> {
+pub fn register(command: &mut CreateApplicationCommand) -> &mut CreateApplicationCommand {
+    command.name("test").description("A test command")
+}
+
+pub async fn run(ctx: Context, command: ApplicationCommandInteraction) -> Result<()> {
     command
         .create_interaction_response(&ctx.http, |response| {
             response
@@ -16,8 +20,4 @@ pub async fn run<'a>(ctx: &'a Context, command: &'a ApplicationCommandInteractio
         })
         .await?;
     Ok(())
-}
-
-pub fn register(command: &mut CreateApplicationCommand) -> &mut CreateApplicationCommand {
-    command.name("test").description("A test command")
 }
