@@ -1,6 +1,6 @@
-use anyhow::Result;
+use anyhow::{Context as AnyhowContext, Result};
 
-pub async fn shutdown(ctx: Context<'_>) -> Result<()> {
+pub async fn run(ctx: Context<'_>) -> Result<()> {
     ctx.framework()
         .shard_manager()
         .lock()

@@ -1,3 +1,3 @@
 pub mod test;
-// pub mod register;
-// pub mod shutdown;
+
+pub struct InteractionCommands;
