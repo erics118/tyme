@@ -3,4 +3,3 @@ builder = "nixpacks"
 
 [deploy]
 restartPolicyType = "never"
-restartPolicyMaxRetries = 1
