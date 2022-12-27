@@ -19,5 +19,6 @@ pub async fn run(ctx: Context, command: ApplicationCommandInteraction) -> Result
                 .interaction_response_data(|message| message.content("success"))
         })
         .await?;
+
     Ok(())
 }

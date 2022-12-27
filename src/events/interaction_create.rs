@@ -8,7 +8,7 @@ pub async fn run(ctx: Context, interaction: Interaction) -> Result<()> {
 
     match interaction {
         Interaction::ApplicationCommand(command) => {
-            println!("Received interaction command: {}", command.data.name);
+            log::trace!("Received interaction command: {}", command.data.name);
 
             let commands = data
                 .get::<InteractionCommands>()
@@ -16,11 +16,12 @@ pub async fn run(ctx: Context, interaction: Interaction) -> Result<()> {
 
             let func = commands
                 .get(&command.data.name)
-                .context("unknown command")?;
+                .context("Unknown command")?;
 
             (func.run)(ctx.clone(), command)
                 .await
-                .context("command execution failed")?;
+                .context("Command execution failed")?;
+
             return Ok(());
         },
         Interaction::MessageComponent(_component) => Ok(()),

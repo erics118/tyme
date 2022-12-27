@@ -23,7 +23,8 @@ use crate::{
 };
 
 pub async fn run(ctx: Context, ready: Ready) -> Result<()> {
-    println!("{} is connected!", ready.user.name);
+    log::info!("{} is connected!", ready.user.name);
+
     let mut data = ctx.data.write().await;
 
     data.insert::<InteractionCommands>(HashMap::default());
@@ -40,25 +41,33 @@ pub async fn run(ctx: Context, ready: Ready) -> Result<()> {
             run: wrap_cmd::<ApplicationCommandInteraction, _>(interactions::commands::test::run),
         },
     );
+    log::trace!("stored interaction commands");
 
-    let commands = Command::set_global_application_commands(&ctx.http, |commands| {
-        commands
-            .create_application_command(|command| interactions::commands::test::register(command))
-    })
-    .await
-    .context("Unable to create global application commands")?;
+    if false {
+        let commands = Command::set_global_application_commands(&ctx.http, |commands| {
+            commands.create_application_command(|command| {
+                interactions::commands::test::register(command)
+            })
+        })
+        .await
+        .context("Unable to create global application commands")?;
 
-    println!(
-        "registered commands: {:?}",
-        commands.iter().map(|c| c.name.as_str()).collect::<Vec<_>>()
-    );
+        log::info!(
+            "registered interaction commands to discord: {:?}",
+            commands.iter().map(|c| c.name.as_str()).collect::<Vec<_>>()
+        );
+    }
 
     let msg_cmds = data
         .get_mut::<MessageCommands>()
         .expect("Expected MessageCommands in TypeMap.");
+
     msg_cmds.insert(
         "shutdown".into(),
         wrap_cmd::<Message, _>(messages::commands::shutdown::run),
     );
+
+    log::trace!("stored all message commands");
+
     Ok(())
 }
