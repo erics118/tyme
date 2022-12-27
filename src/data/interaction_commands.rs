@@ -4,7 +4,7 @@ use serenity::{
     model::application::interaction::application_command::ApplicationCommandInteraction, prelude::*,
 };
 
-use crate::data::run::Run;
+use crate::utils::run::Run;
 
 pub struct InteractionCommand {
     pub run: Run<ApplicationCommandInteraction>,

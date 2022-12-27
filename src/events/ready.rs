@@ -16,10 +16,10 @@ use crate::{
     data::{
         interaction_commands::{InteractionCommand, InteractionCommands},
         message_commands::MessageCommands,
-        run::wrap_cmd,
         self_id::SelfId,
     },
     interactions, messages,
+    utils::run::wrap_cmd,
 };
 
 pub async fn run(ctx: Context, ready: Ready) -> Result<()> {

@@ -2,7 +2,7 @@ use std::collections::HashMap;
 
 use serenity::{model::channel::Message, prelude::TypeMapKey};
 
-use crate::data::run::Run;
+use crate::utils::run::Run;
 
 pub struct MessageCommands;
 

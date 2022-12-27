@@ -4,20 +4,18 @@ use serenity::{
     model::{application::interaction::Interaction, channel::Message, gateway::Ready},
 };
 
+use crate::events;
 pub struct Handler;
 
 #[async_trait]
 impl EventHandler for Handler {
     async fn message(&self, ctx: Context, message: Message) {
-        if crate::events::message_create::run(ctx, message)
-            .await
-            .is_ok()
-        {
+        if events::message_create::run(ctx, message).await.is_ok() {
             println!("ran message event");
         }
     }
     async fn interaction_create(&self, ctx: Context, interaction: Interaction) {
-        if crate::events::interaction_create::run(ctx, interaction)
+        if events::interaction_create::run(ctx, interaction)
             .await
             .is_ok()
         {
@@ -26,7 +24,7 @@ impl EventHandler for Handler {
     }
 
     async fn ready(&self, ctx: Context, ready: Ready) {
-        if crate::events::ready::run(ctx, ready).await.is_ok() {
+        if events::ready::run(ctx, ready).await.is_ok() {
             println!("bot is ready");
         }
     }

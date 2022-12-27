@@ -3,6 +3,7 @@ mod events;
 mod handler;
 mod interactions;
 mod messages;
+mod utils;
 
 use std::env;
 

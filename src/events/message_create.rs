@@ -12,12 +12,10 @@ pub async fn run(ctx: Context, message: Message) -> Result<()> {
         .get::<SelfId>()
         .context("Expected SelfId in TypeMap.")?;
 
-    if message.content.starts_with(&self_id.mention().to_string()) {
-        let content = message
-            .content
-            .get(self_id.mention().to_string().len()..)
-            .unwrap()
-            .to_string();
+    let mention = &self_id.mention().to_string();
+
+    if message.content.starts_with(mention) {
+        let content = message.content.get(mention.len()..).unwrap().to_string();
 
         let commands = data
             .get::<MessageCommands>()
