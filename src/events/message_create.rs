@@ -16,7 +16,7 @@ pub async fn run(ctx: Context, message: Message) -> Result<()> {
     let mention = &self_id.mention().to_string();
 
     if message.content.starts_with(mention) {
-        log::trace!("message command invoked");
+        log::trace!("Message command invoked");
         let content = message.content.get(mention.len()..).unwrap().to_string();
 
         let commands = data
@@ -25,11 +25,11 @@ pub async fn run(ctx: Context, message: Message) -> Result<()> {
 
         let command_name = &content.split(' ').next().unwrap();
 
-        log::trace!("command was {command_name}");
+        log::trace!("Command was {command_name}");
 
         commands
             .get(&command_name.to_string())
-            .context("invalid command")?(ctx.clone(), message);
+            .context("Invalid command")?(ctx.clone(), message);
     }
 
     Ok(())

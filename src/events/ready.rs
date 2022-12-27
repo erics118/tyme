@@ -41,7 +41,8 @@ pub async fn run(ctx: Context, ready: Ready) -> Result<()> {
             run: wrap_cmd::<ApplicationCommandInteraction, _>(interactions::commands::test::run),
         },
     );
-    log::trace!("stored interaction commands");
+
+    log::trace!("Stored interaction commands");
 
     if false {
         let commands = Command::set_global_application_commands(&ctx.http, |commands| {
@@ -53,7 +54,7 @@ pub async fn run(ctx: Context, ready: Ready) -> Result<()> {
         .context("Unable to create global application commands")?;
 
         log::info!(
-            "registered interaction commands to discord: {:?}",
+            "Registered interaction commands to discord: {:?}",
             commands.iter().map(|c| c.name.as_str()).collect::<Vec<_>>()
         );
     }
@@ -67,7 +68,7 @@ pub async fn run(ctx: Context, ready: Ready) -> Result<()> {
         wrap_cmd::<Message, _>(messages::commands::shutdown::run),
     );
 
-    log::trace!("stored all message commands");
+    log::trace!("Stored all message commands");
 
     Ok(())
 }

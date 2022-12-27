@@ -22,11 +22,11 @@ pub async fn run(ctx: Context, interaction: Interaction) -> Result<()> {
                 .await
                 .context("Command execution failed")?;
 
-            return Ok(());
+            Ok(())
         },
         Interaction::MessageComponent(_component) => Ok(()),
         Interaction::ModalSubmit(_modal) => Ok(()),
         Interaction::Autocomplete(_complete) => Ok(()),
-        _ => bail!("uh oh"),
+        _ => bail!("Uh oh"),
     }
 }
