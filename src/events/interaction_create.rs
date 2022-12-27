@@ -1,20 +1,21 @@
 use anyhow::{Context as AnyhowContext, Result};
-use serenity::{model::application::interaction::Interaction, prelude::*};
+use serenity::{client::Context, model::application::interaction::Interaction};
 
-use crate::interactions::commands::InteractionCommands;
+use crate::data::interaction_commands::InteractionCommands;
 
 pub async fn run(ctx: Context, interaction: Interaction) -> Result<()> {
     if let Interaction::ApplicationCommand(command) = interaction {
         println!("Received command interaction: {}", command.data.name);
-        ctx.data
-            .read()
-            .await
+        let data = ctx.data.read().await;
+        let commands = data
             .get::<InteractionCommands>()
-            .context("Expected InteractionCommands in TypeMap.")?
+            .context("Expected InteractionCommands in TypeMap.")?;
+        let func = commands
             .get(&command.data.name)
-            .context("unknown command")?(ctx.clone(), command)
-        .await
-        .context("command execution failed")?;
+            .context("unknown command")?;
+        (func.run)(ctx.clone(), command)
+            .await
+            .context("command execution failed")?;
         Ok(())
     } else {
         Ok(())

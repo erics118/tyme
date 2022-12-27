@@ -1,11 +1,7 @@
-use anyhow::{Context as AnyhowContext, Result};
+use anyhow::Result;
+use serenity::{client::Context, model::channel::Message};
 
-pub async fn run(ctx: Context<'_>) -> Result<()> {
-    ctx.framework()
-        .shard_manager()
-        .lock()
-        .await
-        .shutdown_all()
-        .await;
+pub async fn run(ctx: Context, _message: Message) -> Result<()> {
+    ctx.shard.shutdown_clean();
     Ok(())
 }

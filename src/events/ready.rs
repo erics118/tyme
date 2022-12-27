@@ -1,41 +1,44 @@
-use std::{collections::HashMap, future::Future, pin::Pin};
+use std::collections::HashMap;
 
 use anyhow::{Context as AnyhowContext, Result};
 use serenity::{
+    client::Context,
     model::{
-        application::command::Command, gateway::Ready,
-        prelude::interaction::application_command::ApplicationCommandInteraction,
+        application::{
+            command::Command, interaction::application_command::ApplicationCommandInteraction,
+        },
+        channel::Message,
+        gateway::Ready,
     },
-    prelude::*,
 };
 
-use crate::{interactions, interactions::commands::InteractionCommands};
-
-pub type BoxFuture<T> = Pin<Box<dyn Future<Output = T> + Send + Sync + 'static>>;
-
-pub type Run<T> = Box<dyn Fn(Context, T) -> BoxFuture<anyhow::Result<()>> + Send + Sync + 'static>;
-
-impl TypeMapKey for InteractionCommands {
-    type Value = HashMap<String, Run<ApplicationCommandInteraction>>;
-}
-
-pub fn wrap_cmd<T: 'static, F>(f: fn(Context, T) -> F) -> Run<T>
-where
-    F: Future<Output = anyhow::Result<()>> + Send + Sync + 'static,
-{
-    Box::new(move |ctx, command| Box::pin(f(ctx, command)))
-}
+use crate::{
+    data::{
+        interaction_commands::{InteractionCommand, InteractionCommands},
+        message_commands::MessageCommands,
+        run::wrap_cmd,
+        self_id::SelfId,
+    },
+    interactions, messages,
+};
 
 pub async fn run(ctx: Context, ready: Ready) -> Result<()> {
     println!("{} is connected!", ready.user.name);
     let mut data = ctx.data.write().await;
+
+    data.insert::<InteractionCommands>(HashMap::default());
+    data.insert::<MessageCommands>(HashMap::default());
+    data.insert::<SelfId>(ctx.cache.current_user_id());
+
     let commands = data
         .get_mut::<InteractionCommands>()
         .expect("Expected InteractionCommands in TypeMap.");
 
     commands.insert(
         "test".into(),
-        wrap_cmd::<ApplicationCommandInteraction, _>(interactions::commands::test::run),
+        InteractionCommand {
+            run: wrap_cmd::<ApplicationCommandInteraction, _>(interactions::commands::test::run),
+        },
     );
 
     let commands = Command::set_global_application_commands(&ctx.http, |commands| {
@@ -48,6 +51,14 @@ pub async fn run(ctx: Context, ready: Ready) -> Result<()> {
     println!(
         "registered commands: {:?}",
         commands.iter().map(|c| c.name.as_str()).collect::<Vec<_>>()
+    );
+
+    let msg_cmds = data
+        .get_mut::<MessageCommands>()
+        .expect("Expected MessageCommands in TypeMap.");
+    msg_cmds.insert(
+        "shutdown".into(),
+        wrap_cmd::<Message, _>(messages::commands::shutdown::run),
     );
     Ok(())
 }

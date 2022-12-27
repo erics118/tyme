@@ -1,10 +1,10 @@
 use anyhow::Result;
 use serenity::{
     builder::CreateApplicationCommand,
+    client::Context,
     model::application::interaction::{
         application_command::ApplicationCommandInteraction, InteractionResponseType,
     },
-    prelude::*,
 };
 
 pub fn register(command: &mut CreateApplicationCommand) -> &mut CreateApplicationCommand {
