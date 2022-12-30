@@ -9,7 +9,15 @@ use crate::data::message_commands::MessageCommands;
 pub async fn run(ctx: Context, message: Message) -> Result<()> {
     let mention = ctx.cache.current_user_id().mention().to_string();
 
-    if message.content.starts_with(&mention) {
+    let owner_id = ctx
+        .http
+        .get_current_application_info()
+        .await
+        .context("Couldn't get application info")?
+        .owner
+        .id;
+
+    if message.author.id == owner_id && message.content.starts_with(&mention) {
         log::trace!("Message command invoked");
 
         let content = message
@@ -29,7 +37,7 @@ pub async fn run(ctx: Context, message: Message) -> Result<()> {
 
         log::trace!("Received message command: {command_name}");
 
-        let cmd = commands.get(command_name).unwrap();
+        let cmd = commands.get(command_name).context("Unknown command")?;
 
         (cmd.run)(ctx.clone(), message)
             .await
