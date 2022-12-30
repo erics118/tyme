@@ -51,7 +51,7 @@ pub async fn run(ctx: Context, ready: Ready) -> Result<()> {
     log::info!("Bot connected as: {}", ready.user.name);
 
     ctx.set_activity(Activity::listening("eirk")).await;
-    log::info!("Set status");
+    log::trace!("Set status");
 
     let mut data = ctx.data.write().await;
 
