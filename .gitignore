@@ -12,5 +12,3 @@ target/
 .env
 *.env
 
-# config for spotify cli
-.spotify_cache
