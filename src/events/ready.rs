@@ -9,6 +9,7 @@ use serenity::{
         },
         channel::Message,
         gateway::Ready,
+        prelude::Activity,
     },
 };
 
@@ -47,7 +48,10 @@ macro_rules! store_message_command {
 }
 
 pub async fn run(ctx: Context, ready: Ready) -> Result<()> {
-    log::info!("{} is connected!", ready.user.name);
+    log::info!("Bot connected as: {}", ready.user.name);
+
+    ctx.set_activity(Activity::listening("eirk")).await;
+    log::info!("Set status");
 
     let mut data = ctx.data.write().await;
 
