@@ -14,11 +14,11 @@ pub async fn run(ctx: Context, interaction: Interaction) -> Result<()> {
                 .get::<InteractionCommands>()
                 .context("Expected InteractionCommands in TypeMap.")?;
 
-            let func = commands
+            let cmd = commands
                 .get(&command.data.name)
                 .context("Unknown command")?;
 
-            (func.run)(ctx.clone(), command)
+            (cmd.run)(ctx.clone(), command)
                 .await
                 .context("Command execution failed")?;
 

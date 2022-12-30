@@ -5,29 +5,17 @@ mod interactions;
 mod messages;
 mod utils;
 
-use std::env;
-
 use anyhow::{Context as AnyhowContext, Result};
-use log::LevelFilter;
 use serenity::{client::Client, model::gateway::GatewayIntents};
+use utils::setup::{get_token, setup_logger};
 
 use crate::handler::Handler;
 
 #[tokio::main]
 async fn main() -> Result<()> {
-    env_logger::Builder::new()
-        .filter_level(LevelFilter::Off)
-        .filter_module("tyme", LevelFilter::Trace)
-        .parse_default_env()
-        .default_format()
-        .format_indent(Some(4))
-        .format_level(true)
-        .format_module_path(true)
-        .format_target(false)
-        .format_timestamp_millis()
-        .init();
+    setup_logger();
 
-    let token = env::var("DISCORD_TOKEN").context("Missing `DISCORD_TOKEN` env var")?;
+    let token = get_token().context("Unable to get bot token")?;
 
     let mut client = Client::builder(
         token,
@@ -38,5 +26,6 @@ async fn main() -> Result<()> {
     .context("Error creating client")?;
 
     client.start().await?;
+
     Ok(())
 }

@@ -4,20 +4,22 @@ use serenity::{
     model::{mention::Mentionable, prelude::Message},
 };
 
-use crate::data::{message_commands::MessageCommands, self_id::SelfId};
+use crate::data::message_commands::MessageCommands;
 
 pub async fn run(ctx: Context, message: Message) -> Result<()> {
-    let data = ctx.data.read().await;
+    let mention = ctx.cache.current_user_id().mention().to_string();
 
-    let self_id = data
-        .get::<SelfId>()
-        .context("Expected SelfId in TypeMap.")?;
-
-    let mention = &self_id.mention().to_string();
-
-    if message.content.starts_with(mention) {
+    if message.content.starts_with(&mention) {
         log::trace!("Message command invoked");
-        let content = message.content.get(mention.len()..).unwrap().to_string();
+
+        let content = message
+            .content
+            .get(mention.len()..)
+            .unwrap()
+            .trim()
+            .to_string();
+
+        let data = ctx.data.read().await;
 
         let commands = data
             .get::<MessageCommands>()
@@ -25,11 +27,13 @@ pub async fn run(ctx: Context, message: Message) -> Result<()> {
 
         let command_name = &content.split(' ').next().unwrap();
 
-        log::trace!("Command was {command_name}");
+        log::trace!("Recieved message command: {command_name}");
 
-        commands
+        let cmd = commands
             .get(&command_name.to_string())
-            .context("Invalid command")?(ctx.clone(), message);
+            .context("Invalid command")?;
+
+        (cmd.run)(ctx.clone(), message);
     }
 
     Ok(())
