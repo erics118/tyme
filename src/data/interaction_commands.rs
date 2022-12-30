@@ -8,13 +8,14 @@ use serenity::{
 
 use crate::utils::run::Run;
 
-pub type Register = Box<
-    dyn Fn(&mut CreateApplicationCommand) -> &mut CreateApplicationCommand + Send + Sync + 'static,
->;
-
 pub struct InteractionCommand {
     pub run: Run<ApplicationCommandInteraction>,
-    pub register: Register,
+    pub register: Box<
+        dyn Fn(&mut CreateApplicationCommand) -> &mut CreateApplicationCommand
+            + Send
+            + Sync
+            + 'static,
+    >,
 }
 
 pub struct InteractionCommands;

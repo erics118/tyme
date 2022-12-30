@@ -23,17 +23,17 @@ pub async fn run(ctx: Context, message: Message) -> Result<()> {
 
         let commands = data
             .get::<MessageCommands>()
-            .context("Expected MesageCommands in TypeMap.")?;
+            .context("Expected MesageCommands in TypeMap")?;
 
-        let command_name = &content.split(' ').next().unwrap();
+        let command_name = &content.split(' ').next().unwrap().to_string();
 
-        log::trace!("Recieved message command: {command_name}");
+        log::trace!("Received message command: {command_name}");
 
-        let cmd = commands
-            .get(&command_name.to_string())
-            .context("Invalid command")?;
+        let cmd = commands.get(command_name).unwrap();
 
-        (cmd.run)(ctx.clone(), message);
+        (cmd.run)(ctx.clone(), message)
+            .await
+            .context("Command execution failed")?;
     }
 
     Ok(())

@@ -64,9 +64,6 @@ pub async fn run(ctx: Context, ready: Ready) -> Result<()> {
 
     if false {
         let commands = Command::set_global_application_commands(&ctx.http, |commands| {
-            // for (k, v) in int_cmds.into_iter() {
-            //    commands.create_application_command(|c| (v.register)(c))
-            // }
             commands.create_application_command(|command| {
                 interactions::commands::test::register(command)
             })

@@ -12,7 +12,7 @@ pub async fn run(ctx: Context, interaction: Interaction) -> Result<()> {
 
             let commands = data
                 .get::<InteractionCommands>()
-                .context("Expected InteractionCommands in TypeMap.")?;
+                .context("Expected InteractionCommands in TypeMap")?;
 
             let cmd = commands
                 .get(&command.data.name)
