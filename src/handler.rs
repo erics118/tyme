@@ -11,25 +11,31 @@ pub struct Handler;
 impl EventHandler for Handler {
     async fn message(&self, ctx: Context, message: Message) {
         log::trace!("Running message create event");
-        if events::message_create::run(ctx, message).await.is_ok() {
-            log::trace!("Ran message create event");
+
+        if let Err(e) = events::message_create::run(ctx, message).await {
+            log::error!("{e:?}");
         }
+
+        log::trace!("Ran message create event");
     }
 
     async fn interaction_create(&self, ctx: Context, interaction: Interaction) {
         log::trace!("Running interaction create event");
-        if events::interaction_create::run(ctx, interaction)
-            .await
-            .is_ok()
-        {
-            log::trace!("Ran interaction create event");
+
+        if let Err(e) = events::interaction_create::run(ctx, interaction).await {
+            log::error!("{e:?}");
         }
+
+        log::trace!("Ran interaction create event");
     }
 
     async fn ready(&self, ctx: Context, ready: Ready) {
         log::trace!("Running ready event");
-        if events::ready::run(ctx, ready).await.is_ok() {
-            log::trace!("Ran ready event");
+
+        if let Err(e) = events::ready::run(ctx, ready).await {
+            log::error!("{e:?}");
         }
+
+        log::trace!("Ran ready event");
     }
 }
