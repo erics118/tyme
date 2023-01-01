@@ -1,3 +1,4 @@
+use async_anyhow_logger::catch;
 use serenity::{
     async_trait,
     client::{Context, EventHandler},
@@ -12,9 +13,7 @@ impl EventHandler for Handler {
     async fn message(&self, ctx: Context, message: Message) {
         log::trace!("Running message create event");
 
-        if let Err(e) = events::message_create::run(ctx, message).await {
-            log::error!("{e:?}");
-        }
+        catch(events::message_create::run(ctx, message)).await;
 
         log::trace!("Ran message create event");
     }
@@ -22,9 +21,7 @@ impl EventHandler for Handler {
     async fn interaction_create(&self, ctx: Context, interaction: Interaction) {
         log::trace!("Running interaction create event");
 
-        if let Err(e) = events::interaction_create::run(ctx, interaction).await {
-            log::error!("{e:?}");
-        }
+        catch(events::interaction_create::run(ctx, interaction)).await;
 
         log::trace!("Ran interaction create event");
     }
@@ -32,9 +29,7 @@ impl EventHandler for Handler {
     async fn ready(&self, ctx: Context, ready: Ready) {
         log::trace!("Running ready event");
 
-        if let Err(e) = events::ready::run(ctx, ready).await {
-            log::error!("{e:?}");
-        }
+        catch(events::ready::run(ctx, ready)).await;
 
         log::trace!("Ran ready event");
     }
