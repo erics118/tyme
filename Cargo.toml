@@ -13,19 +13,10 @@ publish = false
 
 [dependencies]
 anyhow = "1.0.68"
+async-anyhow-logger = "0.1.0"
 dotenvy = "0.15.6"
-# atomic_enum = "0.2.0"
-# chrono-english = "0.1.7"
-# derive_more = "0.99.17"
 env_logger = "0.10.0"
-# ksuid = "0.2.0"
 log = "0.4.17"
-# postgres = "0.19.4"
-# date_time_parser = "0.1.1"
 serenity = { version = "0.11.5", default-features = false, features = ["builder", "cache", "client", "gateway","http", "model", "utils", "rustls_backend"]}
-# simple_logger =  {version = "4.0.0", features = ["colored", "timestamps"]}
-# strum = "0.24.1"
-# strum_macros = "0.24.3"
-# thiserror = "1.0.38"
 tokio = { version = "1.23.0", features = ["full"] }
 
