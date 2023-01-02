@@ -15,33 +15,12 @@ use crate::{
         message_commands::{MessageCommand, MessageCommands},
     },
     interactions, messages,
-    utils::{register::register_interaction_commands, run::wrap_cmd},
+    utils::{
+        register::register_interaction_commands,
+        run::wrap_cmd,
+        store::{store_interaction_command, store_message_command},
+    },
 };
-
-macro_rules! store_interaction_command {
-    ($map:ident, $cmd:tt) => {
-        $map.insert(
-            interactions::commands::$cmd::NAME.to_string(),
-            InteractionCommand {
-                run: wrap_cmd::<ApplicationCommandInteraction, _>(
-                    interactions::commands::$cmd::run,
-                ),
-                register: Box::new(interactions::commands::$cmd::register),
-            },
-        )
-    };
-}
-
-macro_rules! store_message_command {
-    ($map:ident, $cmd:tt) => {
-        $map.insert(
-            messages::commands::$cmd::NAME.to_string(),
-            MessageCommand {
-                run: wrap_cmd::<Message, _>(messages::commands::$cmd::run),
-            },
-        )
-    };
-}
 
 pub async fn run(ctx: Context, ready: Ready) -> Result<()> {
     log::info!("Bot connected as: {}", ready.user.name);
