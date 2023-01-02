@@ -86,6 +86,7 @@ pub async fn run(ctx: Context, ready: Ready) -> Result<()> {
         .expect("Expected MessageCommands in TypeMap");
 
     store_message_command!(msg_cmds, shutdown);
+    store_message_command!(msg_cmds, execute);
 
     log::trace!("Stored all message commands");
 
