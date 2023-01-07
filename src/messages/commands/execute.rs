@@ -12,7 +12,7 @@ pub async fn run(ctx: Context, message: Message) -> Result<()> {
         .skip(2)
         .collect::<Vec<&str>>()
         .join(" ");
-    log::debug!("{cmd}");
+    log::info!("Running shell command: {cmd}");
     let output = execute(cmd)?;
 
     message

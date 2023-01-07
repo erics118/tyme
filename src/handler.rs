@@ -1,11 +1,10 @@
-use async_anyhow_logger::catch;
 use serenity::{
     async_trait,
     client::{Context, EventHandler},
     model::{application::interaction::Interaction, channel::Message, gateway::Ready},
 };
 
-use crate::events;
+use crate::{events, utils::catch::catch};
 pub struct Handler;
 
 #[async_trait]

@@ -16,7 +16,6 @@ use crate::{
     },
     interactions, messages,
     utils::{
-        register::register_interaction_commands,
         run::wrap_cmd,
         store::{store_interaction_command, store_message_command},
     },
@@ -41,19 +40,13 @@ pub async fn run(ctx: Context, ready: Ready) -> Result<()> {
 
     log::trace!("Stored interaction commands");
 
-    let commands = register_interaction_commands(&ctx.http, int_cmds).await?;
-
-    log::info!(
-        "Registered interaction commands to discord: {:?}",
-        commands.iter().map(|c| c.name.as_str()).collect::<Vec<_>>()
-    );
-
     let msg_cmds = data
         .get_mut::<MessageCommands>()
         .expect("Expected MessageCommands in TypeMap");
 
-    store_message_command!(msg_cmds, shutdown);
     store_message_command!(msg_cmds, execute);
+    store_message_command!(msg_cmds, register);
+    store_message_command!(msg_cmds, shutdown);
 
     log::trace!("Stored all message commands");
 

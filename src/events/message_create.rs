@@ -1,12 +1,16 @@
-use anyhow::{Context as AnyhowContext, Result};
+use anyhow::{bail, Context as AnyhowContext, Result};
 use serenity::{
     client::Context,
     model::{mention::Mentionable, prelude::Message},
 };
 
-use crate::data::message_commands::MessageCommands;
+use crate::{data::message_commands::MessageCommands, utils::catch::catch_context};
 
 pub async fn run(ctx: Context, message: Message) -> Result<()> {
+    if message.is_own(&ctx.cache) {
+        return Ok(());
+    }
+
     let mention = ctx.cache.current_user_id().mention().to_string();
 
     let owner_id = ctx
@@ -26,7 +30,6 @@ pub async fn run(ctx: Context, message: Message) -> Result<()> {
             .unwrap()
             .trim()
             .to_string();
-
         let data = ctx.data.read().await;
 
         let commands = data
@@ -39,10 +42,9 @@ pub async fn run(ctx: Context, message: Message) -> Result<()> {
 
         let cmd = commands.get(command_name).context("Unknown command")?;
 
-        (cmd.run)(ctx.clone(), message)
-            .await
-            .context("Command execution failed")?;
+        catch_context("Command execution failed", (cmd.run)(ctx.clone(), message)).await;
+        Ok(())
+    } else {
+        bail!("fdsa");
     }
-
-    Ok(())
 }
