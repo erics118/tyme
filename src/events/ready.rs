@@ -27,28 +27,31 @@ pub async fn run(ctx: Context, ready: Ready) -> Result<()> {
     ctx.set_activity(Activity::listening("eirk")).await;
     log::trace!("Set status");
 
-    let mut data = ctx.data.write().await;
+    {
+        let mut data = ctx.data.write().await;
 
-    data.insert::<InteractionCommands>(HashMap::default());
-    data.insert::<MessageCommands>(HashMap::default());
+        data.insert::<InteractionCommands>(HashMap::default());
+        data.insert::<MessageCommands>(HashMap::default());
 
-    let int_cmds = data
-        .get_mut::<InteractionCommands>()
-        .expect("Expected InteractionCommands in TypeMap");
+        let int_cmds = data
+            .get_mut::<InteractionCommands>()
+            .expect("Expected InteractionCommands in TypeMap");
 
-    store_interaction_command!(int_cmds, test);
+        store_interaction_command!(int_cmds, test);
 
-    log::trace!("Stored interaction commands");
+        log::trace!("Stored interaction commands");
 
-    let msg_cmds = data
-        .get_mut::<MessageCommands>()
-        .expect("Expected MessageCommands in TypeMap");
+        let msg_cmds = data
+            .get_mut::<MessageCommands>()
+            .expect("Expected MessageCommands in TypeMap");
 
-    store_message_command!(msg_cmds, execute);
-    store_message_command!(msg_cmds, register);
-    store_message_command!(msg_cmds, shutdown);
+        store_message_command!(msg_cmds, execute);
+        store_message_command!(msg_cmds, register);
+        store_message_command!(msg_cmds, shutdown);
+        store_message_command!(msg_cmds, db);
 
-    log::trace!("Stored all message commands");
+        log::trace!("Stored all message commands");
+    }
 
     Ok(())
 }

@@ -17,6 +17,10 @@ pub fn setup_logger() {
         .init();
 }
 
-pub fn get_token() -> Result<String> {
+pub fn get_discord_token() -> Result<String> {
     env::var("DISCORD_TOKEN").context("Missing `DISCORD_TOKEN` env var")
+}
+
+pub fn get_database_url() -> Result<String> {
+    env::var("DATABASE_URL").context("Missing `DATABASE_URL` env var")
 }
