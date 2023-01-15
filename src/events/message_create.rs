@@ -3,10 +3,11 @@ use serenity::{
     client::Context,
     model::{mention::Mentionable, prelude::Message},
 };
+use tokio_postgres::Client as DbClient;
 
 use crate::{data::message_commands::MessageCommands, utils::catch::catch_context};
 
-pub async fn run(ctx: Context, message: Message) -> Result<()> {
+pub async fn run(ctx: Context, message: Message, db: DbClient) -> Result<()> {
     if message.is_own(&ctx.cache) {
         return Ok(());
     }
@@ -42,7 +43,11 @@ pub async fn run(ctx: Context, message: Message) -> Result<()> {
 
         let cmd = commands.get(command_name).context("Unknown command")?;
 
-        catch_context("Command execution failed", (cmd.run)(ctx.clone(), message)).await;
+        catch_context(
+            "Command execution failed",
+            (cmd.run)(ctx.clone(), message, db),
+        )
+        .await;
         Ok(())
     } else {
         bail!("fdsa");

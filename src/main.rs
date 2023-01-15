@@ -8,13 +8,9 @@ mod utils;
 use std::collections::HashMap;
 
 use anyhow::{Context as AnyhowContext, Result};
-use data::{
-    database::Database, interaction_commands::InteractionCommands,
-    message_commands::MessageCommands,
-};
+use data::{interaction_commands::InteractionCommands, message_commands::MessageCommands};
 use dotenvy::dotenv;
 use serenity::{client::Client, model::gateway::GatewayIntents};
-// use tokio_postgres::{Client as PgClient, NoTls};
 use tokio_postgres::NoTls;
 use utils::setup::{get_database_url, get_discord_token, setup_logger};
 
@@ -48,7 +44,7 @@ async fn main() -> Result<()> {
         token,
         GatewayIntents::GUILD_MESSAGES | GatewayIntents::MESSAGE_CONTENT,
     )
-    .event_handler(Handler)
+    .event_handler(Handler { db: db_client })
     .await
     .context("Error creating client")?;
 
