@@ -5,10 +5,18 @@ mod interactions;
 mod messages;
 mod utils;
 
+use std::collections::HashMap;
+
 use anyhow::{Context as AnyhowContext, Result};
+use data::{
+    database::Database, interaction_commands::InteractionCommands,
+    message_commands::MessageCommands,
+};
 use dotenvy::dotenv;
 use serenity::{client::Client, model::gateway::GatewayIntents};
-use utils::setup::{get_token, setup_logger};
+// use tokio_postgres::{Client as PgClient, NoTls};
+use tokio_postgres::NoTls;
+use utils::setup::{get_database_url, get_discord_token, setup_logger};
 
 use crate::handler::Handler;
 
@@ -24,7 +32,17 @@ async fn main() -> Result<()> {
         log::info!("Not using .env file");
     }
 
-    let token = get_token().context("Unable to get bot token")?;
+    let db_url = get_database_url().context("Unable to get database url")?;
+
+    let (db_client, connection) = tokio_postgres::connect(&db_url, NoTls).await?;
+
+    tokio::spawn(async move {
+        if let Err(e) = connection.await {
+            log::error!("connection error: {}", e);
+        }
+    });
+
+    let token = get_discord_token().context("Unable to get bot token")?;
 
     let mut client = Client::builder(
         token,
@@ -33,6 +51,13 @@ async fn main() -> Result<()> {
     .event_handler(Handler)
     .await
     .context("Error creating client")?;
+
+    {
+        let mut data = client.data.write().await;
+
+        data.insert::<InteractionCommands>(HashMap::default());
+        data.insert::<MessageCommands>(HashMap::default());
+    }
 
     client.start().await?;
 
