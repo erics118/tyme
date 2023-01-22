@@ -7,7 +7,7 @@ mod utils;
 
 use std::collections::HashMap;
 
-use anyhow::{Context as AnyhowContext, Result};
+use color_eyre::eyre::{Result, WrapErr};
 use data::{interaction_commands::InteractionCommands, message_commands::MessageCommands};
 use dotenvy::dotenv;
 use serenity::{client::Client, model::gateway::GatewayIntents};
@@ -44,7 +44,7 @@ async fn main() -> Result<()> {
         token,
         GatewayIntents::GUILD_MESSAGES | GatewayIntents::MESSAGE_CONTENT,
     )
-    .event_handler(Handler { db: db_client })
+    .event_handler(Handler)
     .await
     .context("Error creating client")?;
 

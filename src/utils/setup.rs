@@ -1,6 +1,6 @@
 use std::env;
 
-use anyhow::{Context as AnyhowContext, Result};
+use color_eyre::eyre::{WrapErr, Result};
 use log::LevelFilter;
 
 pub fn setup_logger() {

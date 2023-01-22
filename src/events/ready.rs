@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use anyhow::Result;
+use color_eyre::eyre::Result;
 use serenity::{
     client::Context,
     model::{
@@ -37,7 +37,7 @@ pub async fn run(ctx: Context, ready: Ready) -> Result<()> {
             .get_mut::<InteractionCommands>()
             .expect("Expected InteractionCommands in TypeMap");
 
-        // store_interaction_command!(int_cmds, test);
+        store_interaction_command!(int_cmds, test);
 
         log::trace!("Stored interaction commands");
 
@@ -45,10 +45,10 @@ pub async fn run(ctx: Context, ready: Ready) -> Result<()> {
             .get_mut::<MessageCommands>()
             .expect("Expected MessageCommands in TypeMap");
 
-        // store_message_command!(msg_cmds, execute);
-        // store_message_command!(msg_cmds, register);
+        store_message_command!(msg_cmds, execute);
+        store_message_command!(msg_cmds, register);
         store_message_command!(msg_cmds, shutdown);
-        // store_message_command!(msg_cmds, db);
+        store_message_command!(msg_cmds, db);
 
         log::trace!("Stored all message commands");
     }

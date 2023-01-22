@@ -1,4 +1,4 @@
-use anyhow::Result;
+use color_eyre::eyre::Result;
 use serenity::{client::Context, model::channel::Message};
 
 use crate::{

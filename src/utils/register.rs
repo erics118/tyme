@@ -1,4 +1,4 @@
-use anyhow::{Context as AnyhowContext, Result};
+use color_eyre::eyre::{Result, WrapErr};
 use serenity::{http::Http, model::application::command::Command, prelude::TypeMapKey};
 
 use crate::data::interaction_commands::InteractionCommands;

@@ -1,6 +1,6 @@
 use std::{fmt::Display, future::Future};
 
-use anyhow::{Context, Result};
+use color_eyre::eyre::{WrapErr, Result};
 
 #[allow(dead_code)]
 pub async fn catch_context<F>(context: &'static str, future: F)
