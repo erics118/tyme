@@ -2,7 +2,6 @@ use std::process::exit;
 
 use color_eyre::eyre::Result;
 use serenity::{client::Context, model::channel::Message};
-use tokio_postgres::Client as DbClient;
 
 pub static NAME: &str = "shutdown";
 

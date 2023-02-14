@@ -3,7 +3,6 @@ use serenity::{
     client::{Context, EventHandler},
     model::{application::interaction::Interaction, channel::Message, gateway::Ready},
 };
-use tokio_postgres::Client as DbClient;
 
 use crate::{events, utils::catch::catch};
 

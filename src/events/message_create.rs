@@ -3,7 +3,6 @@ use serenity::{
     client::Context,
     model::{mention::Mentionable, prelude::Message},
 };
-use tokio_postgres::Client as DbClient;
 
 use crate::{data::message_commands::MessageCommands, utils::catch::catch_context};
 

@@ -1,4 +1,4 @@
-use color_eyre::eyre::{ContextCompat, Result, WrapErr};
+use color_eyre::eyre::{ContextCompat, Result};
 use serenity::{client::Context, model::channel::Message};
 
 use crate::data::database::Database;

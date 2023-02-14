@@ -1,6 +1,5 @@
 use color_eyre::eyre::{bail, ContextCompat, Result, WrapErr};
 use serenity::{client::Context, model::application::interaction::Interaction};
-use tokio_postgres::Client as DbClient;
 
 use crate::data::interaction_commands::InteractionCommands;
 

@@ -1,6 +1,6 @@
-use std::{collections::HashMap, sync::Arc};
+use std::sync::Arc;
 
-use serenity::{model::channel::Message, prelude::TypeMapKey};
+use serenity::prelude::TypeMapKey;
 use tokio::sync::{Mutex, RwLock};
 use tokio_postgres::Client as DbClient;
 

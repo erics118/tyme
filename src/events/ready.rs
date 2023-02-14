@@ -48,7 +48,7 @@ pub async fn run(ctx: Context, ready: Ready) -> Result<()> {
         store_message_command!(msg_cmds, execute);
         store_message_command!(msg_cmds, register);
         store_message_command!(msg_cmds, shutdown);
-        store_message_command!(msg_cmds, db);
+        // store_message_command!(msg_cmds, db);
 
         log::trace!("Stored all message commands");
     }
