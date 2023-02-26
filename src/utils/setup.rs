@@ -1,6 +1,6 @@
 use std::env;
 
-use color_eyre::eyre::{WrapErr, Result};
+use color_eyre::eyre::{Result, WrapErr};
 use log::LevelFilter;
 
 pub fn setup_logger() {

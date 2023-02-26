@@ -28,15 +28,15 @@ async fn main() -> Result<()> {
         log::info!("Not using .env file");
     }
 
-    let db_url = get_database_url().context("Unable to get database url")?;
+    // let db_url = get_database_url().context("Unable to get database url")?;
 
-    let (db_client, connection) = tokio_postgres::connect(&db_url, NoTls).await?;
+    // let (db_client, connection) = tokio_postgres::connect(&db_url, NoTls).await?;
 
-    tokio::spawn(async move {
-        if let Err(e) = connection.await {
-            log::error!("connection error: {}", e);
-        }
-    });
+    // tokio::spawn(async move {
+    //     if let Err(e) = connection.await {
+    //         log::error!("connection error: {}", e);
+    //     }
+    // });
 
     let token = get_discord_token().context("Unable to get bot token")?;
 
