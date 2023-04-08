@@ -11,4 +11,3 @@ normalize_comments = true
 normalize_doc_attributes = true
 group_imports = "StdExternalCrate"
 use_field_init_shorthand = true
-

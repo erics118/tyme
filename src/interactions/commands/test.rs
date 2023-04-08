@@ -7,10 +7,8 @@ use serenity::{
     },
 };
 
-pub static NAME: &str = "test";
-
-pub fn register(command: &mut CreateApplicationCommand) -> &mut CreateApplicationCommand {
-    command.name(NAME).description("A test command")
+pub fn _register(command: &mut CreateApplicationCommand) -> &mut CreateApplicationCommand {
+    command.name("test").description("A test command")
 }
 
 pub async fn run(ctx: Context, command: ApplicationCommandInteraction) -> Result<()> {

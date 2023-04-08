@@ -3,8 +3,6 @@ use serenity::{client::Context, model::channel::Message};
 
 use crate::utils::execute::execute;
 
-pub static NAME: &str = "execute";
-
 pub async fn run(ctx: Context, message: Message) -> Result<()> {
     let cmd = message
         .content

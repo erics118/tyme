@@ -1,6 +1,4 @@
 pub mod catch;
 pub mod execute;
-pub mod register;
-pub mod run;
+// pub mod register;
 pub mod setup;
-pub mod store;

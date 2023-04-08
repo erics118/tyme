@@ -1,10 +1,14 @@
-use color_eyre::eyre::{bail, ContextCompat, Result, WrapErr};
+use color_eyre::eyre::{bail, Result, WrapErr};
 use serenity::{
     client::Context,
     model::{mention::Mentionable, prelude::Message},
 };
 
-use crate::{data::message_commands::MessageCommands, utils::catch::catch_context};
+use crate::message_commands;
+
+struct MessageCommands;
+
+message_commands!(execute, register, shutdown);
 
 pub async fn run(ctx: Context, message: Message) -> Result<()> {
     if message.is_own(&ctx.cache) {
@@ -30,19 +34,13 @@ pub async fn run(ctx: Context, message: Message) -> Result<()> {
             .unwrap()
             .trim()
             .to_string();
-        let data = ctx.data.read().await;
 
-        let commands = data
-            .get::<MessageCommands>()
-            .context("Expected MesageCommands in TypeMap")?;
+        let command = &content.split(' ').next().unwrap().to_string();
 
-        let command_name = &content.split(' ').next().unwrap().to_string();
+        log::trace!("Received message command: {command}");
 
-        log::trace!("Received message command: {command_name}");
+        MessageCommands::exec(command, ctx, message).await?;
 
-        let cmd = commands.get(command_name).context("Unknown command")?;
-
-        catch_context("Command execution failed", (cmd.run)(ctx.clone(), message)).await;
         Ok(())
     } else {
         bail!("fdsa");

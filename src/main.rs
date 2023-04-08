@@ -1,20 +1,31 @@
+#![warn(
+    explicit_outlives_requirements,
+    elided_lifetimes_in_paths,
+    let_underscore_drop,
+    missing_debug_implementations,
+    noop_method_call,
+    unsafe_code,
+    unused_qualifications
+)]
+#![warn(clippy::all, clippy::pedantic, clippy::nursery, clippy::cargo)]
+
 mod data;
 mod events;
 mod handler;
 mod interactions;
+mod macros;
 mod messages;
 mod utils;
 
-use std::collections::HashMap;
-
 use color_eyre::eyre::{Result, WrapErr};
-use data::{interaction_commands::InteractionCommands, message_commands::MessageCommands};
 use dotenvy::dotenv;
 use serenity::{client::Client, model::gateway::GatewayIntents};
 use tokio_postgres::NoTls;
-use utils::setup::{get_database_url, get_discord_token, setup_logger};
 
-use crate::handler::Handler;
+use crate::{
+    handler::Handler,
+    utils::setup::{get_database_url, get_discord_token, setup_logger},
+};
 
 #[tokio::main]
 async fn main() -> Result<()> {
@@ -28,15 +39,15 @@ async fn main() -> Result<()> {
         log::info!("Not using .env file");
     }
 
-    // let db_url = get_database_url().context("Unable to get database url")?;
+    let db_url = get_database_url().context("Unable to get database url")?;
 
-    // let (db_client, connection) = tokio_postgres::connect(&db_url, NoTls).await?;
+    let (_db_client, connection) = tokio_postgres::connect(&db_url, NoTls).await?;
 
-    // tokio::spawn(async move {
-    //     if let Err(e) = connection.await {
-    //         log::error!("connection error: {}", e);
-    //     }
-    // });
+    tokio::spawn(async move {
+        if let Err(e) = connection.await {
+            log::error!("connection error: {}", e);
+        }
+    });
 
     let token = get_discord_token().context("Unable to get bot token")?;
 
@@ -49,10 +60,9 @@ async fn main() -> Result<()> {
     .context("Error creating client")?;
 
     {
-        let mut data = client.data.write().await;
+        let _data = client.data.write().await;
 
-        data.insert::<InteractionCommands>(HashMap::default());
-        data.insert::<MessageCommands>(HashMap::default());
+        // data.insert::<Database>(Mutex::new(db_client));
     }
 
     client.start().await?;
