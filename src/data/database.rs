@@ -1,11 +1,9 @@
-use std::sync::Arc;
-
 use serenity::prelude::TypeMapKey;
-use tokio::sync::{Mutex, RwLock};
-use tokio_postgres::Client as DbClient;
+use tokio::sync::Mutex;
+use tokio_postgres::Client as PostgresClient;
 
 pub struct Database;
 
 impl TypeMapKey for Database {
-    type Value = Mutex<Arc<RwLock<DbClient>>>;
+    type Value = Mutex<PostgresClient>;
 }

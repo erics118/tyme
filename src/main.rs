@@ -22,10 +22,13 @@ mod messages;
 mod utils;
 
 use color_eyre::eyre::{Result, WrapErr};
+use data::database::Database;
 use dotenvy::dotenv;
+use openssl::ssl::{SslConnector, SslMethod};
+use postgres_openssl::MakeTlsConnector;
 use serenity::{client::Client, model::gateway::GatewayIntents};
+use tokio::sync::Mutex;
 
-// use tokio_postgres::NoTls;
 use crate::{
     handler::Handler,
     utils::setup::{get_database_url, get_discord_token, setup_logger},
@@ -43,20 +46,18 @@ async fn main() -> Result<()> {
         log::info!("Not using .env file");
     }
 
-    let _db_url = get_database_url().context("Unable to get database url")?;
+    let db_url = get_database_url().context("Unable to get database url")?;
 
-    // let config = rustls::ClientConfig::builder()
-    //     .with_safe_defaults()
-    //     .with_no_client_auth();
-    // let tls = tokio_postgres_rustls::MakeRustlsConnect::new(config);
-    //
-    // let (_db_client, connection) = tokio_postgres::connect(&db_url, tls).await?;
-    //
-    // tokio::spawn(async move {
-    //     if let Err(e) = connection.await {
-    //         log::error!("connection error: {}", e);
-    //     }
-    // });
+    let builder = SslConnector::builder(SslMethod::tls())?;
+    let connector = MakeTlsConnector::new(builder.build());
+
+    let (db_client, connection) = tokio_postgres::connect(&db_url, connector).await?;
+
+    tokio::spawn(async move {
+        if let Err(e) = connection.await {
+            log::error!("connection error: {}", e);
+        }
+    });
 
     let token = get_discord_token().context("Unable to get bot token")?;
 
@@ -69,9 +70,9 @@ async fn main() -> Result<()> {
     .context("Error creating client")?;
 
     {
-        let _data = client.data.write().await;
+        let mut data = client.data.write().await;
 
-        // data.insert::<Database>(Mutex::new(db_client));
+        data.insert::<Database>(Mutex::new(db_client));
     }
 
     client.start().await?;

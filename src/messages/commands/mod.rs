@@ -8,4 +8,4 @@ use serenity::{client::Context, model::prelude::Message};
 
 use crate::message_commands;
 
-message_commands!(execute, register, shutdown);
+message_commands!(execute, register, shutdown, db);

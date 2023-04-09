@@ -1,4 +1,4 @@
-use color_eyre::eyre::{bail, Result, WrapErr};
+use color_eyre::eyre::{Result, WrapErr};
 use serenity::{
     client::Context,
     model::{mention::Mentionable, prelude::Message},
@@ -36,9 +36,7 @@ pub async fn run(ctx: Context, message: Message) -> Result<()> {
         log::trace!("Received message command: {command}");
 
         exec(command, ctx, message).await?;
-
-        Ok(())
-    } else {
-        bail!("fdsa");
     }
+
+    Ok(())
 }
