@@ -5,9 +5,12 @@
     missing_debug_implementations,
     noop_method_call,
     unsafe_code,
-    unused_qualifications
+    unused_qualifications,
+    clippy::all,
+    clippy::pedantic,
+    clippy::nursery,
+    clippy::cargo
 )]
-#![warn(clippy::all, clippy::pedantic, clippy::nursery, clippy::cargo)]
 
 mod data;
 mod events;
@@ -20,8 +23,8 @@ mod utils;
 use color_eyre::eyre::{Result, WrapErr};
 use dotenvy::dotenv;
 use serenity::{client::Client, model::gateway::GatewayIntents};
-use tokio_postgres::NoTls;
 
+// use tokio_postgres::NoTls;
 use crate::{
     handler::Handler,
     utils::setup::{get_database_url, get_discord_token, setup_logger},
@@ -39,15 +42,20 @@ async fn main() -> Result<()> {
         log::info!("Not using .env file");
     }
 
-    let db_url = get_database_url().context("Unable to get database url")?;
+    let _db_url = get_database_url().context("Unable to get database url")?;
 
-    let (_db_client, connection) = tokio_postgres::connect(&db_url, NoTls).await?;
-
-    tokio::spawn(async move {
-        if let Err(e) = connection.await {
-            log::error!("connection error: {}", e);
-        }
-    });
+    // let config = rustls::ClientConfig::builder()
+    //     .with_safe_defaults()
+    //     .with_no_client_auth();
+    // let tls = tokio_postgres_rustls::MakeRustlsConnect::new(config);
+    //
+    // let (_db_client, connection) = tokio_postgres::connect(&db_url, tls).await?;
+    //
+    // tokio::spawn(async move {
+    //     if let Err(e) = connection.await {
+    //         log::error!("connection error: {}", e);
+    //     }
+    // });
 
     let token = get_discord_token().context("Unable to get bot token")?;
 

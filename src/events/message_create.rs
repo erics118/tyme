@@ -35,7 +35,7 @@ pub async fn run(ctx: Context, message: Message) -> Result<()> {
             .trim()
             .to_string();
 
-        let command = &content.split(' ').next().unwrap().to_string();
+        let command = content.split(' ').next().unwrap().to_string();
 
         log::trace!("Received message command: {command}");
 

@@ -2,12 +2,12 @@
 macro_rules! message_commands {
     ($($cmd:ident),*) => (
         impl MessageCommands {
-            async fn exec(command: &str, ctx: Context, message: Message) -> Result<()> {
-                match command {
+            async fn exec(command: String, ctx: Context, message: Message) -> Result<()> {
+                match command.as_str() {
                     $(stringify!($cmd) => $crate::messages::commands::$cmd::run(ctx, message).await?,)*
 
                     #[allow(unreachable_patterns)]
-                    &_ => todo!(),
+                    _ => todo!(),
                 }
                 Ok(())
             }
@@ -25,9 +25,8 @@ macro_rules! interaction_commands {
 
                     #[allow(unreachable_patterns)]
                     _ => todo!(),
-                }Ok(
-()
-                    )
+                }
+                Ok(())
             }
         }
     );
