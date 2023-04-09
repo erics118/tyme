@@ -4,11 +4,7 @@ use serenity::{
     model::{mention::Mentionable, prelude::Message},
 };
 
-use crate::message_commands;
-
-struct MessageCommands;
-
-message_commands!(execute, register, shutdown);
+use crate::messages::commands::exec;
 
 pub async fn run(ctx: Context, message: Message) -> Result<()> {
     if message.is_own(&ctx.cache) {
@@ -39,7 +35,7 @@ pub async fn run(ctx: Context, message: Message) -> Result<()> {
 
         log::trace!("Received message command: {command}");
 
-        MessageCommands::exec(command, ctx, message).await?;
+        exec(command, ctx, message).await?;
 
         Ok(())
     } else {

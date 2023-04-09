@@ -1,29 +1,13 @@
 use color_eyre::eyre::Result;
-use serenity::{client::Context, model::channel::Message};
+use serenity::{
+    client::Context,
+    model::{application::command::Command, channel::Message},
+};
 
-// use crate::utils::register::register_interaction_commands;
+use crate::interactions::commands::register_all;
 
-pub async fn run(_ctx: Context, _message: Message) -> Result<()> {
-    //     let data = ctx.data.read().await;
-    //
-    //     let int_cmds = data
-    //         .get::<InteractionCommands>()
-    //         .expect("Expected InteractionCommands in TypeMap");
-    //
-    //     let commands = register_interaction_commands(&ctx.http, int_cmds).await?;
-    //
-    //     let content = format!(
-    //         "Registered interaction commands to discord: {:?}",
-    //         commands.iter().map(|c| c.name.as_str()).collect::<Vec<_>>()
-    //     );
-    //
-    //     log::info!("{content}");
-    //
-    //     message
-    //         .channel_id
-    //         .send_message(&ctx.http, |msg| msg.content(content))
-    //         .await?;
+pub async fn run(ctx: Context, _message: Message) -> Result<()> {
+    Command::set_global_application_commands(ctx.http, |commands| register_all(commands)).await?;
 
-    // Ok(())
-    todo!()
+    Ok(())
 }

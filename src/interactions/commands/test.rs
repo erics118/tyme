@@ -7,7 +7,7 @@ use serenity::{
     },
 };
 
-pub fn _register(command: &mut CreateApplicationCommand) -> &mut CreateApplicationCommand {
+pub fn register(command: &mut CreateApplicationCommand) -> &mut CreateApplicationCommand {
     command.name("test").description("A test command")
 }
 
