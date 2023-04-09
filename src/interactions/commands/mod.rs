@@ -1,5 +1,3 @@
-pub mod test;
-
 use color_eyre::eyre::Result;
 use serenity::{
     builder::CreateApplicationCommands, client::Context,
