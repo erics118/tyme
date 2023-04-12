@@ -6,9 +6,7 @@ use serenity::{
         application::interaction::{
             application_command::ApplicationCommandInteraction, InteractionResponseType,
         },
-        prelude::{
-            command::CommandOptionType,
-        },
+        prelude::command::CommandOptionType,
     },
 };
 
@@ -34,12 +32,12 @@ pub fn register(command: &mut CreateApplicationCommand) -> &mut CreateApplicatio
 
 pub async fn run(ctx: Context, command: ApplicationCommandInteraction) -> Result<()> {
     command
-    .create_interaction_response(&ctx.http, |response| {
-        response
-            .kind(InteractionResponseType::ChannelMessageWithSource)
-            .interaction_response_data(|message| message.content(format!("{:?}", "fds")))
-    })
-    .await?;
+        .create_interaction_response(&ctx.http, |response| {
+            response
+                .kind(InteractionResponseType::ChannelMessageWithSource)
+                .interaction_response_data(|message| message.content(format!("{:?}", "fds")))
+        })
+        .await?;
 
     Ok(())
 }
