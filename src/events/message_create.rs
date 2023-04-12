@@ -1,4 +1,4 @@
-use color_eyre::eyre::{Result, WrapErr};
+use anyhow::{Context as AnyhowContext, Result};
 use serenity::{
     client::Context,
     model::{mention::Mentionable, prelude::Message},

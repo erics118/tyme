@@ -1,0 +1,49 @@
+repos:
+  - repo: https://github.com/compilerla/conventional-pre-commit
+    rev: v2.1.1
+    hooks:
+      - id: conventional-pre-commit
+        stages: [commit-msg]
+        args:
+          [
+            feat,
+            fix,
+            docs,
+            style,
+            refactor,
+            perf,
+            test,
+            build,
+            ci,
+            chore,
+            revert,
+          ]
+  - repo: https://github.com/doublify/pre-commit-rust
+    rev: v1.0
+    hooks:
+      - id: fmt
+        always_run: true
+        files: '^.*\.rs$'
+      - id: cargo-check
+        always_run: true
+        files: '^.*\.rs$'
+      - id: clippy
+        always_run: true
+        files: '^.*\.rs$'
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.3.0
+    hooks:
+      - id: check-added-large-files
+      - id: check-case-conflict
+      # - id: check-shebang-scripts-are-executable
+      - id: check-json
+        always_run: true
+        files: '^.*\.json$'
+      - id: check-toml
+        always_run: true
+        files: '^.*\.toml$'
+      - id: check-yaml
+        always_run: true
+        files: '^.*\.ya?ml$'
+      - id: destroyed-symlinks
+      - id: end-of-file-fixer

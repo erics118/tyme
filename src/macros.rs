@@ -1,6 +1,9 @@
 #[macro_export]
 macro_rules! message_commands {
     ($($cmd:ident),*) => (
+        use anyhow::Result;
+        use serenity::{client::Context, model::prelude::Message};
+
         $(pub mod $cmd;)*
 
         pub async fn exec(command: String, ctx: Context, message: Message) -> Result<()> {
@@ -19,6 +22,12 @@ macro_rules! message_commands {
 #[macro_export]
 macro_rules! interaction_commands {
     ($($cmd:ident),*) => (
+        use anyhow::Result;
+        use serenity::{
+            builder::CreateApplicationCommands, client::Context,
+            model::application::interaction::application_command::ApplicationCommandInteraction,
+        };
+
         $(pub mod $cmd;)*
 
         pub async fn exec(ctx: Context, command: ApplicationCommandInteraction) -> Result<()>{

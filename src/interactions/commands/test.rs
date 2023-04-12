@@ -1,4 +1,4 @@
-use color_eyre::eyre::Result;
+use anyhow::Result;
 use serenity::{
     builder::CreateApplicationCommand,
     client::Context,

@@ -4,7 +4,7 @@ use serenity::{
     model::{application::interaction::Interaction, channel::Message, gateway::Ready},
 };
 
-use crate::{events, utils::catch::catch};
+use crate::events;
 
 pub struct Handler;
 
@@ -13,7 +13,9 @@ impl EventHandler for Handler {
     async fn message(&self, ctx: Context, message: Message) {
         log::trace!("Running message create event");
 
-        catch(events::message_create::run(ctx, message)).await;
+        if let Err(err) = events::message_create::run(ctx, message).await {
+            log::error!("{:?}", err);
+        }
 
         log::trace!("Ran message create event");
     }
@@ -21,7 +23,9 @@ impl EventHandler for Handler {
     async fn interaction_create(&self, ctx: Context, interaction: Interaction) {
         log::trace!("Running interaction create event");
 
-        catch(events::interaction_create::run(ctx, interaction)).await;
+        if let Err(err) = events::interaction_create::run(ctx, interaction).await {
+            log::error!("{:?}", err);
+        }
 
         log::trace!("Ran interaction create event");
     }
@@ -29,7 +33,9 @@ impl EventHandler for Handler {
     async fn ready(&self, ctx: Context, ready: Ready) {
         log::trace!("Running ready event");
 
-        catch(events::ready::run(ctx, ready)).await;
+        if let Err(err) = events::ready::run(ctx, ready).await {
+            log::error!("{:?}", err);
+        }
 
         log::trace!("Ran ready event");
     }

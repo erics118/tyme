@@ -1,6 +1,6 @@
 use std::process::{Command, Output};
 
-use color_eyre::eyre::{Result, WrapErr};
+use anyhow::{Context, Result};
 
 pub fn execute(cmd: String) -> Result<Output> {
     let output = Command::new("/bin/zsh")

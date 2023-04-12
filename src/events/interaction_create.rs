@@ -1,4 +1,4 @@
-use color_eyre::eyre::Result;
+use anyhow::Result;
 use serenity::{client::Context, model::application::interaction::Interaction};
 
 use crate::interactions::commands::exec;

@@ -1,6 +1,6 @@
 use std::process::exit;
 
-use color_eyre::eyre::Result;
+use anyhow::Result;
 use serenity::{client::Context, model::channel::Message};
 
 pub async fn run(ctx: Context, _message: Message) -> Result<()> {

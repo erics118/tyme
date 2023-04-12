@@ -1,17 +1,14 @@
+#![forbid(unsafe_code)]
 #![warn(
     explicit_outlives_requirements,
     elided_lifetimes_in_paths,
     let_underscore_drop,
     missing_debug_implementations,
     noop_method_call,
-    unsafe_code,
     unused_qualifications,
     clippy::all,
-    clippy::pedantic,
-    clippy::nursery,
-    clippy::cargo
+    clippy::nursery
 )]
-#![allow(clippy::multiple_crate_versions)]
 
 mod data;
 mod events;
@@ -21,17 +18,13 @@ mod macros;
 mod messages;
 mod utils;
 
-use color_eyre::eyre::{Result, WrapErr};
-use data::database::Database;
+use anyhow::{Context, Result};
 use dotenvy::dotenv;
-use openssl::ssl::{SslConnector, SslMethod};
-use postgres_openssl::MakeTlsConnector;
 use serenity::{client::Client, model::gateway::GatewayIntents};
-use tokio::sync::Mutex;
 
 use crate::{
     handler::Handler,
-    utils::setup::{get_database_url, get_discord_token, setup_logger},
+    utils::setup::{get_discord_token, setup_logger},
 };
 
 #[tokio::main]
@@ -46,19 +39,6 @@ async fn main() -> Result<()> {
         log::info!("Not using .env file");
     }
 
-    let db_url = get_database_url().context("Unable to get database url")?;
-
-    let builder = SslConnector::builder(SslMethod::tls())?;
-    let connector = MakeTlsConnector::new(builder.build());
-
-    let (db_client, connection) = tokio_postgres::connect(&db_url, connector).await?;
-
-    tokio::spawn(async move {
-        if let Err(e) = connection.await {
-            log::error!("connection error: {}", e);
-        }
-    });
-
     let token = get_discord_token().context("Unable to get bot token")?;
 
     let mut client = Client::builder(
@@ -68,12 +48,6 @@ async fn main() -> Result<()> {
     .event_handler(Handler)
     .await
     .context("Error creating client")?;
-
-    {
-        let mut data = client.data.write().await;
-
-        data.insert::<Database>(Mutex::new(db_client));
-    }
 
     client.start().await?;
 
