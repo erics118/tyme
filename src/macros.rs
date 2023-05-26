@@ -24,13 +24,13 @@ macro_rules! interaction_commands {
     ($($cmd:ident),*) => (
         use anyhow::Result;
         use serenity::{
-            builder::CreateApplicationCommands, client::Context,
-            model::application::interaction::application_command::ApplicationCommandInteraction,
+            client::Context,
+            model::application::CommandInteraction,
         };
 
         $(pub mod $cmd;)*
 
-        pub async fn exec(ctx: Context, command: ApplicationCommandInteraction) -> Result<()>{
+        pub async fn exec(ctx: Context, command: CommandInteraction) -> Result<()> {
             match command.data.name.as_str() {
                 $(stringify!($cmd) => $crate::interactions::commands::$cmd::run(ctx, command).await?,)*
 
@@ -41,9 +41,15 @@ macro_rules! interaction_commands {
             Ok(())
         }
 
-        pub fn register_all(commands: &mut CreateApplicationCommands) -> &mut CreateApplicationCommands {
-            commands
-                $(.create_application_command(|command| $crate::interactions::commands::$cmd::register(command)))*
+        pub async fn register_all(ctx: Context)  -> Result<()> {
+            drop(serenity::all::Command::set_global_commands(
+                &ctx.http,
+                vec![
+                    $($crate::interactions::commands::$cmd::register(),)*
+                ],
+            )
+            .await?);
+            Ok(())
         }
     );
 }

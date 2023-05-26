@@ -11,7 +11,7 @@ pub async fn run(ctx: Context, message: Message) -> Result<()> {
         return Ok(());
     }
 
-    let mention = ctx.cache.current_user_id().mention().to_string();
+    let mention = ctx.cache.current_user().mention().to_string();
 
     let owner_id = ctx
         .http
@@ -19,6 +19,7 @@ pub async fn run(ctx: Context, message: Message) -> Result<()> {
         .await
         .context("Couldn't get application info")?
         .owner
+        .context("No owner")?
         .id;
 
     if message.author.id == owner_id && message.content.starts_with(&mention) {

@@ -27,6 +27,7 @@ use tokio::sync::Mutex;
 
 use crate::{
     data::db::Database,
+    db::reminders::event_loop::event_reminder_loop,
     handler::Handler,
     utils::setup::{get_database_url, get_discord_token, setup_logger},
 };
@@ -52,16 +53,6 @@ async fn main() -> Result<()> {
         .connect(&database_url)
         .await?;
 
-    // test query
-    let row: (i64,) = sqlx::query_as("SELECT $1")
-        .bind(150_i64)
-        .fetch_one(&pool)
-        .await?;
-
-    assert_eq!(row.0, 150);
-
-    println!("{}", row.0);
-
     log::info!("Database connection successful");
 
     // start discord bot
@@ -77,6 +68,11 @@ async fn main() -> Result<()> {
 
     {
         let mut data = client.data.write().await;
+        let pool2 = pool.clone();
+
+        // tokio::spawn(async move {
+        //     event_reminder_loop(Mutex::new(pool2)).await;
+        // });
 
         data.insert::<Database>(Mutex::new(pool));
     }

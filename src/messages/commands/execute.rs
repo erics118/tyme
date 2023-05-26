@@ -1,5 +1,5 @@
 use anyhow::Result;
-use serenity::{client::Context, model::channel::Message};
+use serenity::{builder::CreateMessage, client::Context, model::channel::Message};
 
 use crate::utils::execute::execute;
 
@@ -15,14 +15,15 @@ pub async fn run(ctx: Context, message: Message) -> Result<()> {
 
     message
         .channel_id
-        .send_message(&ctx.http, |msg| {
-            msg.content(format!(
+        .send_message(
+            &ctx.http,
+            CreateMessage::new().content(format!(
                 "```\nstdout:\n{}\n\n\nstderr:\n{}\n\n\n{}```",
                 String::from_utf8_lossy(&output.stdout),
                 String::from_utf8_lossy(&output.stderr),
                 output.status
-            ))
-        })
+            )),
+        )
         .await?;
 
     Ok(())

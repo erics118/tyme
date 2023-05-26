@@ -1,23 +1,22 @@
 use anyhow::Result;
 use serenity::{
-    builder::CreateApplicationCommand,
+    all::CommandInteraction,
+    builder::{CreateCommand, CreateInteractionResponse, CreateInteractionResponseMessage},
     client::Context,
-    model::application::interaction::{
-        application_command::ApplicationCommandInteraction, InteractionResponseType,
-    },
 };
 
-pub fn register(command: &mut CreateApplicationCommand) -> &mut CreateApplicationCommand {
-    command.name("test").description("A test command")
+pub fn register() -> CreateCommand {
+    CreateCommand::new("test").description("A test command")
 }
 
-pub async fn run(ctx: Context, command: ApplicationCommandInteraction) -> Result<()> {
+pub async fn run(ctx: Context, command: CommandInteraction) -> Result<()> {
     command
-        .create_interaction_response(&ctx.http, |response| {
-            response
-                .kind(InteractionResponseType::ChannelMessageWithSource)
-                .interaction_response_data(|message| message.content("success"))
-        })
+        .create_response(
+            &ctx.http,
+            CreateInteractionResponse::Message(
+                CreateInteractionResponseMessage::new().content("success"),
+            ),
+        )
         .await?;
 
     Ok(())

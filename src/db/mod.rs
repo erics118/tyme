@@ -1,1 +1,1 @@
-pub mod create_reminder;
+pub mod reminders;

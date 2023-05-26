@@ -1,57 +1,54 @@
 use anyhow::{Context as AnyhowContext, Result};
 use serenity::{
-    builder::CreateApplicationCommand,
-    client::Context,
-    model::{
-        application::interaction::{
-            application_command::ApplicationCommandInteraction, InteractionResponseType,
-        },
-        prelude::{
-            command::CommandOptionType, interaction::application_command::CommandDataOptionValue,
-        },
+    all::{CommandInteraction, ResolvedOption, ResolvedValue},
+    builder::{
+        CreateCommand, CreateCommandOption, CreateInteractionResponse,
+        CreateInteractionResponseMessage,
     },
+    client::Context,
+    model::application::CommandOptionType,
 };
 
-use crate::{data::db::Database, db::create_reminder::create_reminder};
+use crate::{data::db::Database, db::reminders::create_reminder::create_reminder};
 
-pub fn register(command: &mut CreateApplicationCommand) -> &mut CreateApplicationCommand {
-    command
-        .name("remind")
+pub fn register() -> CreateCommand {
+    CreateCommand::new("remind")
         .description("Remind you about something")
-        .create_option(|option| {
-            option
-                .name("days")
-                .description("In how many days to remind you")
-                .kind(CommandOptionType::Integer)
-                .required(true)
-        })
-        .create_option(|option| {
-            option
-                .name("description")
-                .description("What to remind you about")
-                .kind(CommandOptionType::String)
-                .required(true)
-        })
+        .add_option(
+            CreateCommandOption::new(
+                CommandOptionType::Integer,
+                "days",
+                "In how many days to remind you",
+            )
+            .required(true),
+        )
+        .add_option(
+            CreateCommandOption::new(
+                CommandOptionType::String,
+                "message",
+                "What to remind you about",
+            )
+            .required(true),
+        )
 }
 
-pub async fn run(ctx: Context, command: ApplicationCommandInteraction) -> Result<()> {
-    let CommandDataOptionValue::Integer(days) = command.data.options
-        .get(0)
-        .expect("Expected days option")
-        .resolved
-        .as_ref()
-        .expect("Expected days object") else {
-            panic!("Expected days object");
-        };
+pub async fn run(ctx: Context, command: CommandInteraction) -> Result<()> {
+    let o = command.data.options();
+    let Some(ResolvedOption {
+        value: ResolvedValue::Integer(days),
+        ..
+    }) = o.get(0)
+     else {
+        panic!("f")
+    };
 
-    let CommandDataOptionValue::String(description) = command.data.options
-        .get(1)
-        .expect("Expected description option")
-        .resolved
-        .as_ref()
-        .expect("Expected description object") else {
-            panic!("Expected description object");
-        };
+    let Some(ResolvedOption {
+        value: ResolvedValue::String(description),
+        ..
+    }) = o.get(1)
+     else {
+        panic!("f")
+    };
 
     let data = ctx.data.read().await;
 
@@ -64,11 +61,12 @@ pub async fn run(ctx: Context, command: ApplicationCommandInteraction) -> Result
     create_reminder(&pool, *days, description.to_string()).await?;
 
     command
-        .create_interaction_response(&ctx.http, |response| {
-            response
-                .kind(InteractionResponseType::ChannelMessageWithSource)
-                .interaction_response_data(|message| message.content(format!("{:?}", "fds")))
-        })
+        .create_response(
+            &ctx.http,
+            CreateInteractionResponse::Message(
+                CreateInteractionResponseMessage::new().content(format!("{:?}", "fds")),
+            ),
+        )
         .await?;
 
     Ok(())

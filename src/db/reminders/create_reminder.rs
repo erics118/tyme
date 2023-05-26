@@ -1,14 +1,13 @@
 use anyhow::Result;
-use sqlx::{postgres::PgPool, types::uuid::Uuid};
+use sqlx::types::Uuid;
 
-pub async fn create_reminder(pool: &PgPool, days: i64, description: String) -> Result<Uuid> {
+pub async fn create_reminder(pool: &sqlx::PgPool, days: i64, description: String) -> Result<Uuid> {
     let rec = sqlx::query!(
         r#"
 INSERT INTO reminders (id, created_at, time, message)
-VALUES ( $1::UUID, $2::TIMESTAMP, $3::TIMESTAMP, $4::TEXT )
+VALUES (gen_random_uuid(), $1::TIMESTAMP, $2::TIMESTAMP, $3::TEXT)
 RETURNING id;
         "#,
-        Uuid::new_v4(),
         sqlx::types::chrono::Utc::now().naive_utc(),
         sqlx::types::chrono::Utc::now().naive_utc() + chrono::Duration::days(days.into()),
         description

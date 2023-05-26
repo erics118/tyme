@@ -1,7 +1,7 @@
 use serenity::{
     async_trait,
     client::{Context, EventHandler},
-    model::{application::interaction::Interaction, channel::Message, gateway::Ready},
+    model::{application::Interaction, channel::Message, gateway::Ready},
 };
 
 use crate::events;
