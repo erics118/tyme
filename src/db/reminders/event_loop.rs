@@ -44,7 +44,7 @@ WHERE "time" <= CURRENT_TIMESTAMP;
             created_at: row.created_at,
             time: row.time,
             message: row.message,
-            author_id: UserId::from(row.author_id as u64),
+            creator_id: UserId::from(row.creator_id as u64),
             thread_id: ChannelId::from(row.thread_id as u64),
             channel_id: ChannelId::from(row.channel_id as u64),
             guild_id: GuildId::from(row.guild_id as u64),

@@ -7,7 +7,7 @@ pub struct Reminder {
     pub created_at: NaiveDateTime,
     pub time: NaiveDateTime,
     pub message: String,
-    pub author_id: UserId,
+    pub creator_id: UserId,
     pub thread_id: ChannelId,
     pub channel_id: ChannelId,
     pub guild_id: GuildId,
