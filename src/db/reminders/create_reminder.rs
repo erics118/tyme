@@ -14,9 +14,9 @@ RETURNING id;
         r.time,
         r.message,
         i64::from(r.creator_id),
-        i64::from(r.thread_id.unwrap_or_default()),
+        r.thread_id.map(|a| i64::from(a)),
         i64::from(r.channel_id),
-        i64::from(r.guild_id),
+        r.guild_id.map(|a| i64::from(a)),
     )
     .fetch_one(pool)
     .await?;

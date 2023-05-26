@@ -47,7 +47,7 @@ WHERE "time" <= CURRENT_TIMESTAMP;
             creator_id: UserId::from(row.creator_id as u64),
             thread_id: row.thread_id.map(|a| ChannelId::from(a as u64)),
             channel_id: ChannelId::from(row.channel_id as u64),
-            guild_id: GuildId::from(row.guild_id as u64),
+            guild_id: row.guild_id.map(|a| GuildId::from(a as u64)),
         });
     }
 

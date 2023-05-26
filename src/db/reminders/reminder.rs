@@ -10,5 +10,5 @@ pub struct Reminder {
     pub creator_id: UserId,
     pub thread_id: Option<ChannelId>,
     pub channel_id: ChannelId,
-    pub guild_id: GuildId,
+    pub guild_id: Option<GuildId>,
 }
