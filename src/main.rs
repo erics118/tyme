@@ -70,9 +70,9 @@ async fn main() -> Result<()> {
         let mut data = client.data.write().await;
         let pool2 = pool.clone();
 
-        // tokio::spawn(async move {
-        //     event_reminder_loop(Mutex::new(pool2)).await;
-        // });
+        tokio::spawn(async move {
+            event_reminder_loop(Mutex::new(pool2)).await;
+        });
 
         data.insert::<Database>(Mutex::new(pool));
     }

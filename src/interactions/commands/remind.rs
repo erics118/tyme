@@ -9,7 +9,10 @@ use serenity::{
     model::application::CommandOptionType,
 };
 
-use crate::{data::db::Database, db::reminders::create_reminder::create_reminder};
+use crate::{
+    data::db::Database,
+    db::reminders::{create_reminder::create_reminder, reminder::Reminder},
+};
 
 pub fn register() -> CreateCommand {
     CreateCommand::new("remind")
@@ -58,7 +61,18 @@ pub async fn run(ctx: Context, command: CommandInteraction) -> Result<()> {
 
     let pool = db.lock().await;
 
-    create_reminder(&pool, *days, description.to_string()).await?;
+    let r = Reminder {
+        id: sqlx::types::Uuid::new_v4(),
+        created_at: sqlx::types::chrono::Utc::now().naive_utc(),
+        time: sqlx::types::chrono::Utc::now().naive_utc() + chrono::Duration::days((*days).into()),
+        message: description.to_string(),
+        creator_id: command.user.id,
+        thread_id: None,
+        channel_id: command.channel_id,
+        guild_id: command.guild_id.unwrap(),
+    };
+
+    create_reminder(&pool, r).await?;
 
     command
         .create_response(
