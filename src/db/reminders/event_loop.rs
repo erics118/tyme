@@ -6,10 +6,12 @@ use serenity::{
     builder::CreateMessage,
     http::CacheHttp,
     model::id::{ChannelId, GuildId, UserId},
+    prelude::Mentionable,
 };
 use tokio::{sync::Mutex, time::sleep};
 
 use super::reminder::Reminder;
+use crate::utils::timestamp::{DiscordTimestamp, TimestampFormat};
 
 pub async fn event_reminder_loop(pool: Mutex<sqlx::PgPool>, http: impl CacheHttp) {
     loop {
@@ -22,9 +24,14 @@ pub async fn event_reminder_loop(pool: Mutex<sqlx::PgPool>, http: impl CacheHttp
         log::trace!("{current_time}");
 
         for r in reminders {
-            log::info!("Reminder: {} | {}!", r.message, r.id);
+            log::info!("{:#?}!", r);
 
-            let message = format!("Reminder: ```rs\n{:#?}\n```", r);
+            let message = format!(
+                "Reminder for {}: {}\nSet {}",
+                r.creator_id.mention(),
+                r.message,
+                r.created_at.discord_timestamp(TimestampFormat::Relative),
+            );
 
             #[allow(clippy::unwrap_used)]
             r.channel_id
