@@ -1,6 +1,6 @@
 use std::process::{Command, Output};
 
-use anyhow::{Context, Result};
+use anyhow::{Context as _, Result};
 
 pub fn execute(cmd: String) -> Result<Output> {
     let output = Command::new("/bin/zsh")

@@ -9,8 +9,9 @@
     clippy::all,
     clippy::nursery,
     clippy::expect_used,
-    clippy::unwrap_used,
+    clippy::unwrap_used
 )]
+#![allow(clippy::significant_drop_tightening)]
 
 mod data;
 mod db;
@@ -21,7 +22,7 @@ mod macros;
 mod messages;
 mod utils;
 
-use anyhow::{Context, Result};
+use anyhow::{Context as _, Result};
 use dotenvy::dotenv;
 use serenity::{client::Client, model::gateway::GatewayIntents};
 use sqlx::postgres::PgPoolOptions;
@@ -29,7 +30,6 @@ use tokio::sync::Mutex;
 
 use crate::{
     data::db::Database,
-    db::reminders::event_loop::event_reminder_loop,
     handler::Handler,
     utils::setup::{get_database_url, get_discord_token, setup_logger},
 };
@@ -37,6 +37,7 @@ use crate::{
 #[tokio::main]
 async fn main() -> Result<()> {
     let dotenv_state = dotenv().is_ok();
+
     setup_logger();
 
     if dotenv_state {
@@ -50,10 +51,7 @@ async fn main() -> Result<()> {
 
     log::info!("Connecting to database");
 
-    let pool = PgPoolOptions::new()
-        .max_connections(5)
-        .connect(&database_url)
-        .await?;
+    let pool = PgPoolOptions::new().connect(&database_url).await?;
 
     log::info!("Database connection successful");
 
@@ -70,11 +68,6 @@ async fn main() -> Result<()> {
 
     {
         let mut data = client.data.write().await;
-        let pool2 = pool.clone();
-
-        tokio::spawn(async move {
-            event_reminder_loop(Mutex::new(pool2)).await;
-        });
 
         data.insert::<Database>(Mutex::new(pool));
     }

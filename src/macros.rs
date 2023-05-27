@@ -11,7 +11,7 @@ macro_rules! message_commands {
                 $(stringify!($cmd) => $crate::messages::commands::$cmd::run(ctx, message).await?,)*
 
                 #[allow(unreachable_patterns)]
-                _ => todo!(),
+                _ => (),
             }
 
             Ok(())
@@ -35,7 +35,7 @@ macro_rules! interaction_commands {
                 $(stringify!($cmd) => $crate::interactions::commands::$cmd::run(ctx, command).await?,)*
 
                 #[allow(unreachable_patterns)]
-                _ => todo!(),
+                _ => (),
             }
 
             Ok(())

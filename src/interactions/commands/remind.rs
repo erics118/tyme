@@ -1,4 +1,4 @@
-use anyhow::{Context as AnyhowContext, Result};
+use anyhow::{Context as _, Result};
 use serenity::{
     all::{CommandInteraction, ResolvedOption, ResolvedValue},
     builder::{
@@ -38,6 +38,7 @@ pub fn register() -> CreateCommand {
 #[allow(clippy::significant_drop_tightening)]
 pub async fn run(ctx: Context, command: CommandInteraction) -> Result<()> {
     let o = command.data.options();
+
     let Some(ResolvedOption {
         value: ResolvedValue::Integer(days),
         ..
@@ -68,7 +69,6 @@ pub async fn run(ctx: Context, command: CommandInteraction) -> Result<()> {
         time: sqlx::types::chrono::Utc::now().naive_utc() + chrono::Duration::days(*days),
         message: description.to_string(),
         creator_id: command.user.id,
-        thread_id: None,
         channel_id: command.channel_id,
         // if guild_id exists, use the guild. otherwise, DMs
         guild_id: command.guild_id,

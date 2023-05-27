@@ -1,4 +1,4 @@
-use anyhow::{Context as AnyhowContext, Result};
+use anyhow::{Context as _, Result};
 use serenity::{
     client::Context,
     model::{mention::Mentionable, prelude::Message},
@@ -25,18 +25,15 @@ pub async fn run(ctx: Context, message: Message) -> Result<()> {
     if message.author.id == owner_id && message.content.starts_with(&mention) {
         log::trace!("Message command invoked");
 
-        let content = message
-            .content
-            .get(mention.len()..)
-            .unwrap()
-            .trim()
-            .to_string();
+        let content = message.content.trim().to_string();
 
-        let command = content.split(' ').next().unwrap().to_string();
+        if let Some(command) = content.split(' ').next() {
+            let command = command.to_string();
 
-        log::trace!("Received message command: {command}");
+            log::trace!("Received message command: {command}");
 
-        exec(command, ctx, message).await?;
+            exec(command, ctx, message).await?;
+        }
     }
 
     Ok(())

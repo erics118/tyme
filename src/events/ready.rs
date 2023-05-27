@@ -1,9 +1,12 @@
-use anyhow::Result;
+use anyhow::{Context as _, Result};
 use serenity::{
     client::Context,
     gateway::ActivityData,
     model::gateway::{ActivityType, Ready},
 };
+use tokio::sync::Mutex;
+
+use crate::{data::db::Database, db::reminders::event_loop::event_reminder_loop};
 
 pub async fn run(ctx: Context, ready: Ready) -> Result<()> {
     log::info!("Bot connected as: {}", ready.user.name);
@@ -14,6 +17,20 @@ pub async fn run(ctx: Context, ready: Ready) -> Result<()> {
         url: None,
     }));
     log::trace!("Set status");
+
+    let data = ctx.data.read().await;
+
+    let db = data
+        .get::<Database>()
+        .context("Expected `Database` in TypeMap")?;
+
+    let pool = db.lock().await;
+
+    let pool2 = pool.clone();
+
+    tokio::spawn(async move {
+        event_reminder_loop(Mutex::new(pool2), &ctx.http).await;
+    });
 
     Ok(())
 }
