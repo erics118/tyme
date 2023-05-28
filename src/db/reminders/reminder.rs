@@ -10,7 +10,7 @@ pub struct Reminder {
     pub created_at: NaiveDateTime,
     pub time: NaiveDateTime,
     pub message: String,
-    pub creator_id: UserId,
+    pub user_id: UserId,
     pub channel_id: ChannelId,
     pub guild_id: Option<GuildId>,
 }
@@ -21,14 +21,14 @@ impl Reminder {
 
         let rec = sqlx::query!(
             r#"
-    INSERT INTO reminders (id, created_at, time, message, creator_id, channel_id, guild_id)
+    INSERT INTO reminders (id, created_at, time, message, user_id, channel_id, guild_id)
     VALUES (gen_random_uuid(), $1::TIMESTAMP, $2::TIMESTAMP, $3::TEXT, $4::BIGINT, $5::BIGINT, $6::BIGINT)
     RETURNING id;
             "#,
             self.created_at,
             self.time,
             self.message,
-            i64::from(self.creator_id),
+            i64::from(self.user_id),
             i64::from(self.channel_id),
             self.guild_id.map(|a| i64::from(a)),
         )

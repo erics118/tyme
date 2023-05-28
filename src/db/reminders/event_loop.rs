@@ -28,7 +28,7 @@ pub async fn event_reminder_loop(pool: Mutex<sqlx::PgPool>, http: impl CacheHttp
 
             let message = format!(
                 "Reminder for {}: {}\nSet {}",
-                r.creator_id.mention(),
+                r.user_id.mention(),
                 r.message,
                 r.created_at.discord_timestamp(TimestampFormat::Relative),
             );
@@ -65,7 +65,7 @@ RETURNING *
             created_at: row.created_at,
             time: row.time,
             message: row.message,
-            creator_id: UserId::from(row.creator_id as u64),
+            user_id: UserId::from(row.user_id as u64),
             channel_id: ChannelId::from(row.channel_id as u64),
             guild_id: row.guild_id.map(|a| GuildId::from(a as u64)),
         });

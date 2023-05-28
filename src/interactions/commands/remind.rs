@@ -59,7 +59,7 @@ pub async fn run(ctx: Context, command: CommandInteraction) -> Result<()> {
         created_at: sqlx::types::chrono::Utc::now().naive_utc(),
         time: sqlx::types::chrono::Utc::now().naive_utc() + chrono::Duration::days(*days),
         message: description.to_string(),
-        creator_id: command.user.id,
+        user_id: command.user.id,
         channel_id: command.channel_id,
         guild_id: command.guild_id,
     };
