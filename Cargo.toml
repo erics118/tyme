@@ -1,2 +1,9 @@
 [workspace]
-members = ["bot", "human_time"]
+members = [
+    "tyme",
+    "tyme-api",
+    "tyme-db",
+    "tyme-discord",
+    "tyme-web",
+    "tyme-utils",
+]

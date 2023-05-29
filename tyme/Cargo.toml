@@ -1,0 +1,33 @@
+[package]
+name = "tyme"
+version = "0.1.0"
+authors = ["erics118"]
+edition = "2021"
+rust-version = "1.68.0"
+description = "A reminder service"
+repository = "https://github.com/erics118/tyme"
+license = "MIT"
+keywords = ["reminder"]
+categories = []
+publish = false
+
+[dependencies]
+tyme-utils = { path = "../tyme-utils" }
+tyme-discord = { path = "../tyme-discord" }
+anyhow = {version="1.0.71", features = ["backtrace"]}
+dotenvy = "0.15.7"
+env_logger = "0.10.0"
+log = "0.4.18"
+tokio = { version = "1.28.2", features = ["full"] }
+
+
+[dependencies.sqlx]
+version = "0.6"
+features = [
+    "runtime-tokio-rustls",
+    "postgres",
+    "macros",
+    "uuid",
+    "chrono",
+    "tls",
+]

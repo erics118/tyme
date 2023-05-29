@@ -1,5 +1,5 @@
 [package]
-name = "human_time"
+name = "tyme-utils"
 version = "0.1.0"
 edition = "2021"
 publish = false

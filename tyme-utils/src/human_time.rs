@@ -1,3 +1,5 @@
+use std::{fmt::Display, ops::Add};
+
 use anyhow::Result;
 use chrono::{Days, Duration, Months, NaiveDateTime};
 use slice_group_by::StrGroupBy;
@@ -96,78 +98,12 @@ impl HumanTime {
         }
     }
 
-    pub fn to_string(&self) -> String {
-        let mut res = String::new();
-
-        if self.years > 0 {
-            res += &format!(
-                "{} year{}",
-                self.years.to_string(),
-                if self.years > 1 { "s" } else { "" }
-            );
-        }
-
-        if self.months > 0 {
-            res += &format!(
-                "{} month{}",
-                self.months.to_string(),
-                if self.months > 1 { "s" } else { "" }
-            );
-        }
-
-        if self.weeks > 0 {
-            res += &format!(
-                "{} week{}",
-                self.weeks.to_string(),
-                if self.weeks > 1 { "s" } else { "" }
-            );
-        }
-
-        if self.days > 0 {
-            res += &format!(
-                "{} day{}",
-                self.days.to_string(),
-                if self.days > 1 { "s" } else { "" }
-            );
-        }
-
-        if self.hours > 0 {
-            res += &format!(
-                "{} hour{}",
-                self.hours.to_string(),
-                if self.hours > 1 { "s" } else { "" }
-            );
-        }
-
-        if self.minutes > 0 {
-            res += &format!(
-                "{} minute{}",
-                self.minutes.to_string(),
-                if self.minutes > 1 { "s" } else { "" }
-            );
-        }
-
-        if self.seconds > 0 {
-            res += &format!(
-                "{} second{}",
-                self.seconds.to_string(),
-                if self.seconds > 1 { "s" } else { "" }
-            );
-        }
-
-        res
-    }
-
     pub fn add_to(&self, d: &mut NaiveDateTime) {
-        *d = d
-            .checked_add_days(Days::new((self.days + self.weeks * 7).into()))
-            .unwrap();
-
         *d = d
             .checked_add_months(Months::new(self.months + self.years * 12))
             .unwrap();
         *d = d
-            .checked_add_signed(Duration::seconds(self.seconds.into()))
+            .checked_add_days(Days::new((self.days + self.weeks * 7).into()))
             .unwrap();
         *d = d
             .checked_add_signed(Duration::hours(self.hours.into()))
@@ -175,6 +111,95 @@ impl HumanTime {
         *d = d
             .checked_add_signed(Duration::minutes(self.minutes.into()))
             .unwrap();
+        *d = d
+            .checked_add_signed(Duration::seconds(self.seconds.into()))
+            .unwrap();
+    }
+}
+
+impl Add<HumanTime> for NaiveDateTime {
+    type Output = NaiveDateTime;
+
+    fn add(self, rhs: HumanTime) -> Self::Output {
+        let mut a = self;
+        a = a
+            .checked_add_months(Months::new(rhs.months + rhs.years * 12))
+            .unwrap();
+        a = a
+            .checked_add_days(Days::new((rhs.days + rhs.weeks * 7).into()))
+            .unwrap();
+        a = a
+            .checked_add_signed(Duration::hours(rhs.hours.into()))
+            .unwrap();
+        a = a
+            .checked_add_signed(Duration::minutes(rhs.minutes.into()))
+            .unwrap();
+        a = a
+            .checked_add_signed(Duration::seconds(rhs.seconds.into()))
+            .unwrap();
+        a
+    }
+}
+
+impl Display for HumanTime {
+    fn fmt(&self, fmt: &mut std::fmt::Formatter) -> std::fmt::Result {
+        if self.years > 0 {
+            fmt.write_str(&format!(
+                "{} year{}",
+                self.years.to_string(),
+                if self.years > 1 { "s" } else { "" }
+            ))?;
+        }
+
+        if self.months > 0 {
+            fmt.write_str(&format!(
+                "{} month{}",
+                self.months.to_string(),
+                if self.months > 1 { "s" } else { "" }
+            ))?;
+        }
+
+        if self.weeks > 0 {
+            fmt.write_str(&format!(
+                "{} week{}",
+                self.weeks.to_string(),
+                if self.weeks > 1 { "s" } else { "" }
+            ))?;
+        }
+
+        if self.days > 0 {
+            fmt.write_str(&format!(
+                "{} day{}",
+                self.days.to_string(),
+                if self.days > 1 { "s" } else { "" }
+            ))?;
+        }
+
+        if self.hours > 0 {
+            fmt.write_str(&format!(
+                "{} hour{}",
+                self.hours.to_string(),
+                if self.hours > 1 { "s" } else { "" }
+            ))?;
+        }
+
+        if self.minutes > 0 {
+            fmt.write_str(&format!(
+                "{} minute{}",
+                self.minutes.to_string(),
+                if self.minutes > 1 { "s" } else { "" }
+            ))?;
+        }
+
+        if self.seconds > 0 {
+            fmt.write_str(&format!(
+                "{} second{}",
+                self.seconds.to_string(),
+                if self.seconds > 1 { "s" } else { "" }
+            ))?;
+        }
+
+        Ok(())
     }
 }
 
