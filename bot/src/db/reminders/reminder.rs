@@ -21,9 +21,9 @@ impl Reminder {
 
         let rec = sqlx::query!(
             r#"
-    INSERT INTO reminders (id, created_at, time, message, user_id, channel_id, guild_id)
-    VALUES (gen_random_uuid(), $1::TIMESTAMP, $2::TIMESTAMP, $3::TEXT, $4::BIGINT, $5::BIGINT, $6::BIGINT)
-    RETURNING id;
+            INSERT INTO reminders (id, created_at, time, message, user_id, channel_id, guild_id)
+            VALUES (gen_random_uuid(), $1::TIMESTAMP, $2::TIMESTAMP, $3::TEXT, $4::BIGINT, $5::BIGINT, $6::BIGINT)
+            RETURNING id;
             "#,
             self.created_at,
             self.time,

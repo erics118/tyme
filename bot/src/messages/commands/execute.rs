@@ -17,12 +17,14 @@ pub async fn run(ctx: Context, message: Message) -> Result<()> {
         .channel_id
         .send_message(
             &ctx.http,
-            CreateMessage::new().content(format!(
-                "```\nstdout:\n{}\n\n\nstderr:\n{}\n\n\n{}```",
-                String::from_utf8_lossy(&output.stdout),
-                String::from_utf8_lossy(&output.stderr),
-                output.status
-            )),
+            CreateMessage::new()
+                .content(format!(
+                    "```\nstdout:\n{}\n\n\nstderr:\n{}\n\n\n{}```",
+                    String::from_utf8_lossy(&output.stdout),
+                    String::from_utf8_lossy(&output.stderr),
+                    output.status
+                ))
+                .reference_message(&message),
         )
         .await?;
 

@@ -1,0 +1,10 @@
+[package]
+name = "human_time"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[dependencies]
+anyhow = {version = "1.0.71", features = ["backtrace"]}
+chrono = "0.4.24"
+slice-group-by = "0.3.1"

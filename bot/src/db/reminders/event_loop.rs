@@ -49,9 +49,9 @@ pub async fn fetch_past_reminders(pool: &Mutex<sqlx::PgPool>) -> Result<Vec<Remi
 
     let query = sqlx::query!(
         r#"
-DELETE FROM reminders
-WHERE "time" <= CURRENT_TIMESTAMP
-RETURNING *
+        DELETE FROM reminders
+        WHERE time <= CURRENT_TIMESTAMP
+        RETURNING *;
         "#
     );
 

@@ -2,7 +2,6 @@
 #![warn(
     explicit_outlives_requirements,
     elided_lifetimes_in_paths,
-    let_underscore_drop,
     missing_debug_implementations,
     noop_method_call,
     unused_qualifications,
