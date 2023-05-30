@@ -7,7 +7,7 @@ use serenity::{
 };
 use tyme_db::timezones::timezone::Timezone;
 
-use crate::data::db::Database;
+use crate::data::database::Database;
 pub async fn run(ctx: Context, command: CommandInteraction) -> Result<()> {
     let o = command.data.options();
 

@@ -12,3 +12,5 @@ target/
 .env
 *.env
 
+tyme-api
+tyme-web

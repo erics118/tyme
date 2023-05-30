@@ -24,7 +24,7 @@ use serenity::{client::Client, model::gateway::GatewayIntents};
 use sqlx::PgPool;
 use tokio::sync::Mutex;
 
-use crate::{data::db::Database, handler::Handler};
+use crate::{data::database::Database, handler::Handler};
 
 pub async fn start(token: String, pool: Mutex<PgPool>) -> Result<()> {
     let mut client = Client::builder(

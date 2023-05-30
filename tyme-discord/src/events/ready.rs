@@ -7,7 +7,7 @@ use serenity::{
 use tokio::sync::Mutex;
 use tyme_db::reminders::event_loop::event_reminder_loop;
 
-use crate::data::db::Database;
+use crate::data::database::Database;
 
 pub async fn run(ctx: Context, ready: Ready) -> Result<()> {
     log::info!("Bot connected as: {}", ready.user.name);

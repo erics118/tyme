@@ -14,7 +14,7 @@ use tyme_db::{reminders::reminder::Reminder, timezones::timezone::Timezone};
 use tyme_utils::human_time::HumanTime;
 use uuid::Uuid;
 
-use crate::data::db::Database;
+use crate::data::database::Database;
 
 pub fn register() -> CreateCommand {
     CreateCommand::new("remind")

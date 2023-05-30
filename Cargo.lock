@@ -180,6 +180,7 @@ dependencies = [
  "iana-time-zone",
  "js-sys",
  "num-traits",
+ "serde",
  "time 0.1.45",
  "wasm-bindgen",
  "winapi",
@@ -1840,10 +1841,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "tyme-api"
-version = "0.1.0"
-
-[[package]]
 name = "tyme-db"
 version = "0.1.0"
 dependencies = [
@@ -1851,6 +1848,7 @@ dependencies = [
  "chrono",
  "chrono-tz",
  "log",
+ "serde",
  "serenity",
  "sqlx",
  "tokio",
@@ -1882,10 +1880,6 @@ dependencies = [
  "chrono",
  "slice-group-by",
 ]
-
-[[package]]
-name = "tyme-web"
-version = "0.1.0"
 
 [[package]]
 name = "typemap_rev"
@@ -1981,6 +1975,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "345444e32442451b267fc254ae85a209c64be56d2890e601a0c37ff0c3c5ecd2"
 dependencies = [
  "getrandom",
+ "serde",
 ]
 
 [[package]]
