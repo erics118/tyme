@@ -11,6 +11,3 @@ target/
 # env files
 .env
 *.env
-
-tyme-api
-tyme-web
