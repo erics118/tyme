@@ -97,7 +97,7 @@ impl Reminder {
                 user_id: UserId::from(row.user_id as u64),
                 channel_id: ChannelId::from(row.channel_id as u64),
                 guild_id: row.guild_id.map(|a| GuildId::from(a as u64)),
-            })
+            });
         }
 
         Ok(reminders)
