@@ -7,6 +7,7 @@ use serenity::{
 use tyme_db::timezones::timezone::Timezone;
 
 use crate::data::database::Database;
+
 pub async fn run(ctx: Context, command: CommandInteraction) -> Result<()> {
     let data = ctx.data.read().await;
 
@@ -14,7 +15,7 @@ pub async fn run(ctx: Context, command: CommandInteraction) -> Result<()> {
         .get::<Database>()
         .context("Expected `Database` in TypeMap")?;
 
-    let res = match Timezone::remove(command.user.id, pool).await {
+    let res = match Timezone::delete(command.user.id, pool).await {
         Ok(t) => format!("Your timezone of `{}` has been deleted", t.timezone.name()),
         Err(_) => "No timezone is set".to_string(),
     };

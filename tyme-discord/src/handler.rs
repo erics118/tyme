@@ -6,6 +6,7 @@ use serenity::{
 
 use crate::events;
 
+#[derive(Debug)]
 pub struct Handler;
 
 #[async_trait]

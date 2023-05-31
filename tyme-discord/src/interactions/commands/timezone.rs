@@ -28,8 +28,8 @@ pub fn register() -> CreateCommand {
         ))
         .add_option(CreateCommandOption::new(
             CommandOptionType::SubCommand,
-            "remove",
-            "Remove your default timezone",
+            "delete",
+            "Delete your default timezone",
         ))
 }
 
@@ -41,7 +41,7 @@ pub async fn run(ctx: Context, command: CommandInteraction) -> Result<()> {
     match subcommand.name {
         "set" => super::timezone_set::run(ctx, command).await?,
         "get" => super::timezone_get::run(ctx, command).await?,
-        "remove" => super::timezone_remove::run(ctx, command).await?,
+        "delete" => super::timezone_delete::run(ctx, command).await?,
         _ => unreachable!(),
     };
 

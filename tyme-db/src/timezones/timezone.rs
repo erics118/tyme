@@ -1,9 +1,10 @@
 use anyhow::{Context, Result};
 use chrono_tz::Tz;
+use serde::{Deserialize, Serialize};
 use serenity::model::id::UserId;
 use tokio::sync::Mutex;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Timezone {
     pub user_id: UserId,
     pub timezone: Tz,
@@ -52,7 +53,7 @@ impl Timezone {
         Ok(())
     }
 
-    pub async fn remove(user_id: UserId, pool: &Mutex<sqlx::PgPool>) -> Result<Self> {
+    pub async fn delete(user_id: UserId, pool: &Mutex<sqlx::PgPool>) -> Result<Self> {
         let pool = pool.lock().await;
 
         let record = sqlx::query!(

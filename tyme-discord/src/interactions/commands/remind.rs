@@ -63,10 +63,11 @@ pub async fn run(ctx: Context, command: CommandInteraction) -> Result<()> {
             .create_response(
                 &ctx.http,
                 CreateInteractionResponse::Message(
-                    CreateInteractionResponseMessage::new().content("Invalid timezone."),
+                    CreateInteractionResponseMessage::new().content("Invalid time."),
                 ),
             )
             .await?;
+        
         return Ok(());
     };
 
@@ -83,7 +84,7 @@ pub async fn run(ctx: Context, command: CommandInteraction) -> Result<()> {
         guild_id: command.guild_id,
     };
 
-    r.create(&pool).await?;
+    r.create(pool).await?;
 
     let msg = format!(
         "Reminder set for {} on **{}**",

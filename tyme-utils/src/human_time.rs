@@ -35,7 +35,7 @@ impl HumanTime {
 
         for t in tokens {
             match t {
-                num if num.chars().all(char::is_numeric) => n = num.parse::<u32>().unwrap(),
+                num if num.chars().all(char::is_numeric) => n = num.parse::<u32>()?,
                 "y" | "yr" | "yrs" | "year" | "years" => {
                     res.years += n;
                     n = 0
@@ -97,29 +97,12 @@ impl HumanTime {
             self.months %= 12;
         }
     }
-
-    pub fn add_to(&self, d: &mut NaiveDateTime) {
-        *d = d
-            .checked_add_months(Months::new(self.months + self.years * 12))
-            .unwrap();
-        *d = d
-            .checked_add_days(Days::new((self.days + self.weeks * 7).into()))
-            .unwrap();
-        *d = d
-            .checked_add_signed(Duration::hours(self.hours.into()))
-            .unwrap();
-        *d = d
-            .checked_add_signed(Duration::minutes(self.minutes.into()))
-            .unwrap();
-        *d = d
-            .checked_add_signed(Duration::seconds(self.seconds.into()))
-            .unwrap();
-    }
 }
 
 impl Add<HumanTime> for NaiveDateTime {
     type Output = NaiveDateTime;
 
+    #[allow(clippy::unwrap_used)]
     fn add(self, rhs: HumanTime) -> Self::Output {
         let mut a = self;
         a = a
@@ -142,7 +125,7 @@ impl Add<HumanTime> for NaiveDateTime {
 }
 
 impl Display for HumanTime {
-    fn fmt(&self, fmt: &mut std::fmt::Formatter) -> std::fmt::Result {
+    fn fmt(&self, fmt: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         if self.years > 0 {
             fmt.write_str(&format!(
                 "{} year{}",
@@ -205,53 +188,19 @@ impl Display for HumanTime {
 
 #[cfg(test)]
 mod tests {
-    use chrono::Utc;
+    #[test]
+    fn debug_normal() {
+        assert_eq!(
+            format!("{:?}", super::HumanTime::parse("3 min 2 sec 50 hr")),
+            "Ok(HumanTime { years: 0, months: 0, weeks: 0, days: 0, hours: 50, minutes: 3, seconds: 2 })"
+        );
+    }
 
     #[test]
-    fn it_works() {
-        let result = 2 + 2;
-        assert_eq!(result, 4);
-    }
-    #[test]
-    fn aaa() {
-        let a = super::HumanTime::parse("30 min").unwrap();
-        let mut b = Utc::now().naive_utc();
-        a.add_to(&mut b);
-        println!("{:#?}", b);
+    fn debug_no() {
         assert_eq!(
             format!("{:?}", super::HumanTime::parse("3 min 2 sec 50 hr")),
             "Ok(HumanTime { years: 0, months: 0, weeks: 0, days: 0, hours: 50, minutes: 3, seconds: 2 })"
         );
     }
 }
-
-// fn get_tokens(str: String) -> Vec<String> {
-// let s = (str + " ").as_str();
-// let mut res: Vec<String> = Vec::new();
-// let mut start: usize = 0;
-//
-// for i in s.as_bytes().enum
-// for i in 0..(s.len() - 1) {
-// if (((s.as_bytes()[i] as char) as char).is_alphanumeric()  &&
-// (s.as_bytes()[i+1] as char).is_whitespace())   // `a ` or `1 `
-// ||  (((s.as_bytes()[i] as char) as char).is_numeric() && (s.as_bytes()[i + 1]
-// as char).is_alphanumeric())     // `a1` || ((s.as_bytes()[i] as
-// char).is_alphanumeric() && (s.as_bytes()[i + 1] as char).is_numeric()) `1a`
-// {
-// res.push(s[start..i].to_string());
-// start = i + 1;
-// }
-//
-// if ((s.as_bytes()[i] as char).is_whitespace()  && (s.as_bytes()[i+1] as
-// char).is_alphanumeric())   // `a ` or `1 ` ||  ((s.as_bytes()[i] as
-// char).is_alphanumeric() && (s.as_bytes()[i + 1] as char).is_numeric())     //
-// `a1` || ((s.as_bytes()[i] as char).is_numeric() && (s.as_bytes()[i + 1]as
-// char).is_alphanumeric()) `1a`
-// {
-// start = i + 1;
-// }
-// }
-// println!("{res:#?}");
-//
-// return res;
-// }
