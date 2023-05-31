@@ -11,7 +11,7 @@ use serenity::{
     model::application::CommandOptionType,
 };
 use tyme_db::{reminders::reminder::Reminder, timezones::timezone::Timezone};
-use tyme_utils::human_time::HumanTime;
+use tyme_utils::human_time::{HumanTime, CheckedAddHumanTime};
 use uuid::Uuid;
 
 use crate::data::database::Database;
@@ -56,6 +56,7 @@ pub async fn run(ctx: Context, command: CommandInteraction) -> Result<()> {
         Ok(t) => t.timezone,
         Err(_) => chrono_tz::UTC,
     };
+    let now = Utc::now().naive_utc();
 
     // parse `when`
     let Ok(a) = HumanTime::parse(when) else {
@@ -71,13 +72,24 @@ pub async fn run(ctx: Context, command: CommandInteraction) -> Result<()> {
         return Ok(());
     };
 
-    let now = Utc::now().naive_utc();
+    let Ok(now)  = now.checked_add(a) else {
+        command
+        .create_response(
+            &ctx.http,
+            CreateInteractionResponse::Message(
+                CreateInteractionResponseMessage::new().content("Invalid time."),
+            ),
+        )
+        .await?;
+    
+        return Ok(());
+    };
 
     // create reminder
     let r = Reminder {
         id: Uuid::new_v4(),
         created_at: Utc::now().naive_utc(),
-        time: now + a,
+        time: now,
         message: description.to_string(),
         user_id: command.user.id,
         channel_id: command.channel_id,

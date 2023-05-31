@@ -1,6 +1,6 @@
-use std::{fmt::Display, ops::Add};
+use std::fmt::Display;
 
-use anyhow::Result;
+use anyhow::{Context, Result};
 use chrono::{Days, Duration, Months, NaiveDateTime};
 use slice_group_by::StrGroupBy;
 
@@ -99,28 +99,32 @@ impl HumanTime {
     }
 }
 
-impl Add<HumanTime> for NaiveDateTime {
-    type Output = NaiveDateTime;
+pub trait CheckedAddHumanTime {
+    fn checked_add(self, a: HumanTime) -> Result<Self>
+    where
+        Self: Sized;
+}
 
-    #[allow(clippy::unwrap_used)]
-    fn add(self, rhs: HumanTime) -> Self::Output {
+impl CheckedAddHumanTime for NaiveDateTime {
+    fn checked_add(self, rhs: HumanTime) -> Result<Self> {
         let mut a = self;
         a = a
             .checked_add_months(Months::new(rhs.months + rhs.years * 12))
-            .unwrap();
+            .context("checked add overflow")?;
         a = a
             .checked_add_days(Days::new((rhs.days + rhs.weeks * 7).into()))
-            .unwrap();
+            .context("checked add overflow")?;
         a = a
             .checked_add_signed(Duration::hours(rhs.hours.into()))
-            .unwrap();
+            .context("checked add overflow")?;
         a = a
             .checked_add_signed(Duration::minutes(rhs.minutes.into()))
-            .unwrap();
+            .context("checked add overflow")?;
         a = a
             .checked_add_signed(Duration::seconds(rhs.seconds.into()))
-            .unwrap();
-        a
+            .context("checked add overflow")?;
+
+        Ok(a)
     }
 }
 

@@ -30,6 +30,7 @@ impl Timezone {
             Ok(t) => t,
             Err(_) => anyhow::bail!("database corrupted, timezone invalid"),
         };
+
         Ok(Self { user_id, timezone })
     }
 
@@ -68,8 +69,10 @@ impl Timezone {
         .await?
         .context("does not exist")?;
 
-        let timezone =
-            Tz::from_str_insensitive(&record.timezone).unwrap_or_else(|_| panic!("uh oh"));
+        let timezone = match Tz::from_str_insensitive(&record.timezone) {
+            Ok(t) => t,
+            Err(_) => anyhow::bail!("database corrupted, timezone invalid"),
+        };
 
         Ok(Self { user_id, timezone })
     }
