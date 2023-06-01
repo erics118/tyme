@@ -1,6 +1,11 @@
 [workspace]
-members = [
-    "tyme-db",
-    "tyme-discord",
-    "tyme-utils",
-]
+resolver = "2"
+members = ["tyme-db", "tyme-discord", "tyme-utils"]
+
+[workspace.package]
+authors = ["erics118"]
+edition = "2021"
+rust-version = "1.68.0"
+repository = "https://github.com/erics118/tyme"
+license = "MIT"
+publish = false
