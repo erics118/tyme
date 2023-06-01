@@ -7,7 +7,6 @@
     clippy::expect_used,
     clippy::unwrap_used
 )]
-#![feature(async_closure)]
 
 pub mod data;
 pub mod events;
