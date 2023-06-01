@@ -19,10 +19,9 @@ pub async fn run(ctx: Context, command: CommandInteraction) -> Result<()> {
     let reminders = Reminder::get_by_user_id(pool, command.user.id).await?;
 
     // get user's timezone
-    let timezone: Tz = match Timezone::get(command.user.id, pool).await {
-        Ok(t) => t.timezone,
-        Err(_) => Tz::UTC,
-    };
+    let timezone: Tz = Timezone::get(command.user.id, pool)
+        .await
+        .map_or_else(|_| Tz::UTC, |t| t.timezone);
 
     let embed = CreateEmbed::new().title("Reminders").description(
         reminders

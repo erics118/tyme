@@ -52,10 +52,10 @@ pub async fn run(ctx: Context, command: CommandInteraction) -> Result<()> {
         .context("Expected `Database` in TypeMap")?;
 
     // get user's timezone
-    let timezone: Tz = match Timezone::get(command.user.id, pool).await {
-        Ok(t) => t.timezone,
-        Err(_) => chrono_tz::UTC,
-    };
+    let timezone: Tz = Timezone::get(command.user.id, pool)
+        .await
+        .map_or_else(|_| Tz::UTC, |t| t.timezone);
+
     let now = Utc::now().naive_utc();
 
     // parse `when`
