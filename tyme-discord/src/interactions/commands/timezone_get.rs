@@ -15,7 +15,7 @@ pub async fn run(ctx: Context, command: CommandInteraction) -> Result<()> {
         .get::<Database>()
         .context("Expected `Database` in TypeMap")?;
 
-    let res = match Timezone::get(command.user.id, pool).await {
+    let res = match Timezone::get(pool, command.user.id).await {
         Ok(t) => format!("Your timezone is `{}`", t.timezone.name()),
         Err(_) => "No timezone is set".to_string(),
     };

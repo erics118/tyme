@@ -15,6 +15,10 @@ pub struct HumanTime {
 }
 
 fn get_tokens(s: &str) -> Vec<String> {
+    if s.len() < 2 {
+        return Vec::new();
+    }
+
     let chars = s
         .chars()
         .filter(|c| !c.is_whitespace())
@@ -37,7 +41,11 @@ fn get_tokens(s: &str) -> Vec<String> {
             tok.clear();
         }
     }
+
+    #[allow(clippy::unwrap_used)]
+    // guaranteed not to error, because s is at least 2 chars long
     tok.push(*chars.last().unwrap());
+
     if !tok.is_empty() {
         vec.push(tok.clone());
     }

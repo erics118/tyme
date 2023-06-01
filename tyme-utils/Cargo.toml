@@ -11,3 +11,4 @@ publish.workspace = true
 [dependencies]
 anyhow = { version = "1.0.71", features = ["backtrace"] }
 chrono = "0.4.26"
+chrono-tz = "0.8.2"

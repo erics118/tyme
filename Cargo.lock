@@ -1344,7 +1344,7 @@ dependencies = [
 [[package]]
 name = "serenity"
 version = "0.11.5"
-source = "git+https://github.com/serenity-rs/serenity?branch=next#296886b860ebbe888e6e554308ff76155bdcc95e"
+source = "git+https://github.com/serenity-rs/serenity?branch=next#6f256e7c11713bd0b457520c5c1a5f736ac3f9ec"
 dependencies = [
  "async-trait",
  "base64 0.21.2",
@@ -1860,6 +1860,7 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "chrono",
+ "chrono-tz",
 ]
 
 [[package]]

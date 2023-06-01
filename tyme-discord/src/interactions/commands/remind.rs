@@ -33,7 +33,6 @@ pub fn register() -> CreateCommand {
         )
 }
 
-#[allow(clippy::significant_drop_tightening)]
 pub async fn run(ctx: Context, command: CommandInteraction) -> Result<()> {
     let o = command.data.options();
 
@@ -52,7 +51,7 @@ pub async fn run(ctx: Context, command: CommandInteraction) -> Result<()> {
         .context("Expected `Database` in TypeMap")?;
 
     // get user's timezone
-    let timezone: Tz = Timezone::get(command.user.id, pool)
+    let timezone: Tz = Timezone::get(pool, command.user.id)
         .await
         .map_or_else(|_| Tz::UTC, |t| t.timezone);
 

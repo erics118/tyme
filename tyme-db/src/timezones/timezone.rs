@@ -11,7 +11,7 @@ pub struct Timezone {
 }
 
 impl Timezone {
-    pub async fn get(user_id: UserId, pool: &Mutex<sqlx::PgPool>) -> Result<Self> {
+    pub async fn get(pool: &Mutex<sqlx::PgPool>, user_id: UserId) -> Result<Self> {
         let pool = pool.lock().await;
 
         let record = sqlx::query!(
@@ -52,14 +52,14 @@ impl Timezone {
         Ok(())
     }
 
-    pub async fn delete(user_id: UserId, pool: &Mutex<sqlx::PgPool>) -> Result<Self> {
+    pub async fn delete(pool: &Mutex<sqlx::PgPool>, user_id: UserId) -> Result<Self> {
         let pool = pool.lock().await;
 
         let record = sqlx::query!(
             r#"
             DELETE FROM timezones
             WHERE user_id = $1::BIGINT
-            RETURNING *
+            RETURNING *;
             "#,
             i64::from(user_id),
         )

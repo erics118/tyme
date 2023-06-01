@@ -6,6 +6,7 @@ use serenity::{
     client::Context,
 };
 use tyme_db::{reminders::reminder::Reminder, timezones::timezone::Timezone};
+use tyme_utils::pretty::Pretty;
 
 use crate::data::database::Database;
 
@@ -16,27 +17,17 @@ pub async fn run(ctx: Context, command: CommandInteraction) -> Result<()> {
         .get::<Database>()
         .context("Expected `Database` in TypeMap")?;
 
-    let reminders = Reminder::get_by_user_id(pool, command.user.id).await?;
+    let reminders = Reminder::get_all_by_user_id(pool, command.user.id).await?;
 
     // get user's timezone
-    let timezone: Tz = Timezone::get(command.user.id, pool)
+    let timezone: Tz = Timezone::get(pool, command.user.id)
         .await
         .map_or_else(|_| Tz::UTC, |t| t.timezone);
 
     let embed = CreateEmbed::new().title("Reminders").description(
         reminders
             .iter()
-            .map(|r| {
-                format!(
-                    "{} - {} - {}",
-                    r.id,
-                    r.message,
-                    r.time
-                        .and_utc()
-                        .with_timezone(&timezone)
-                        .format("%h %e, %Y at %l:%M %p %Z")
-                )
-            })
+            .map(|r| format!("{} - {} - {}", r.id, r.message, r.time.pretty(timezone)))
             .collect::<Vec<_>>()
             .join("\n"),
     );

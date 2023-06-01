@@ -1,6 +1,5 @@
 use chrono::NaiveDateTime;
 
-#[allow(dead_code)]
 pub enum TimestampFormat {
     ShortTime,
     LongTime,

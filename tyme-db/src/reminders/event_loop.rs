@@ -11,7 +11,7 @@ pub async fn event_reminder_loop(pool: Mutex<sqlx::PgPool>, http: impl CacheHttp
     loop {
         // Retrieve events from the database
         #[allow(clippy::unwrap_used)]
-        let reminders = Reminder::fetch_past_reminders(&pool).await.unwrap();
+        let reminders = Reminder::get_all_past_reminders(&pool).await.unwrap();
 
         let current_time = Utc::now();
 
