@@ -30,11 +30,11 @@ fn get_tokens(s: &str) -> Vec<String> {
         let a = w[0];
         let b = w[1];
         tok.push(a);
-        if (a.is_alphabetic() && b.is_numeric()) || (a.is_numeric() && b.is_alphabetic()) {
-            if !tok.is_empty() {
-                vec.push(tok.clone());
-                tok.clear();
-            }
+        if ((a.is_alphabetic() && b.is_numeric()) || (a.is_numeric() && b.is_alphabetic()))
+            && !tok.is_empty()
+        {
+            vec.push(tok.clone());
+            tok.clear();
         }
     }
     tok.push(*chars.last().unwrap());
@@ -215,7 +215,7 @@ impl Display for HumanTime {
             );
         }
 
-        if res.ends_with(" ") {
+        if res.ends_with(' ') {
             res.pop();
         }
 

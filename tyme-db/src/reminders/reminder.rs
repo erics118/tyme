@@ -39,7 +39,7 @@ impl Reminder {
         Ok(record.id)
     }
 
-    pub async fn fetch_past_reminders(pool: &Mutex<sqlx::PgPool>) -> Result<Vec<Reminder>> {
+    pub async fn fetch_past_reminders(pool: &Mutex<sqlx::PgPool>) -> Result<Vec<Self>> {
         let pool = pool.lock().await;
 
         let rows = sqlx::query!(
@@ -55,7 +55,7 @@ impl Reminder {
         let mut reminders = Vec::new();
 
         for row in rows {
-            reminders.push(Reminder {
+            reminders.push(Self {
                 id: row.id,
                 created_at: row.created_at,
                 time: row.time,
@@ -69,10 +69,7 @@ impl Reminder {
         Ok(reminders)
     }
 
-    pub async fn get_by_user_id(
-        pool: &Mutex<sqlx::PgPool>,
-        user_id: UserId,
-    ) -> Result<Vec<Reminder>> {
+    pub async fn get_by_user_id(pool: &Mutex<sqlx::PgPool>, user_id: UserId) -> Result<Vec<Self>> {
         let pool = pool.lock().await;
 
         let rows = sqlx::query!(
@@ -86,10 +83,10 @@ impl Reminder {
         .fetch_all(&*pool)
         .await?;
 
-        let mut reminders: Vec<Reminder> = Vec::new();
+        let mut reminders: Vec<Self> = Vec::new();
 
         for row in rows {
-            reminders.push(Reminder {
+            reminders.push(Self {
                 id: row.id,
                 created_at: row.created_at,
                 time: row.time,

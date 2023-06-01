@@ -4,6 +4,7 @@
     elided_lifetimes_in_paths,
     unused_qualifications,
     clippy::all,
+    clippy::nursery,
     clippy::expect_used,
     clippy::unwrap_used
 )]
