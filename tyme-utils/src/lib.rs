@@ -1,3 +1,4 @@
+#![feature(stmt_expr_attributes)]
 #![forbid(unsafe_code)]
 #![warn(
     explicit_outlives_requirements,

@@ -1415,12 +1415,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "slice-group-by"
-version = "0.3.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "826167069c09b99d56f31e9ae5c99049e932a98c9dc2dac47645b08dbbf76ba7"
-
-[[package]]
 name = "smallvec"
 version = "1.10.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1827,10 +1821,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "tyme"
-version = "0.1.0"
-
-[[package]]
 name = "tyme-db"
 version = "0.1.0"
 dependencies = [
@@ -1870,7 +1860,6 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "chrono",
- "slice-group-by",
 ]
 
 [[package]]

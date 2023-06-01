@@ -1,6 +1,5 @@
 [workspace]
 members = [
-    "tyme",
     "tyme-db",
     "tyme-discord",
     "tyme-utils",

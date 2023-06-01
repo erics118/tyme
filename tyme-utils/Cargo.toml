@@ -5,6 +5,5 @@ edition = "2021"
 publish = false
 
 [dependencies]
-anyhow = {version = "1.0.71", features = ["backtrace"]}
+anyhow = { version = "1.0.71", features = ["backtrace"] }
 chrono = "0.4.26"
-slice-group-by = "0.3.1"

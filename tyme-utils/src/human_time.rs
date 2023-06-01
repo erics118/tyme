@@ -2,7 +2,6 @@ use std::fmt::Display;
 
 use anyhow::{Context, Result};
 use chrono::{Days, Duration, Months, NaiveDateTime};
-use slice_group_by::StrGroupBy;
 
 #[derive(Default, Copy, Clone, Debug)]
 pub struct HumanTime {
@@ -15,10 +14,34 @@ pub struct HumanTime {
     pub seconds: u32,
 }
 
-fn get_tokens(s: &str) -> Vec<&str> {
-    s.linear_group_by_key(|c: char| (c.is_alphabetic() as u8) * 2 + c.is_numeric() as u8)
-        .filter(|s| !s.trim().is_empty())
-        .collect()
+fn get_tokens(s: &str) -> Vec<String> {
+    let chars = s
+        .chars()
+        .filter(|c| !c.is_whitespace())
+        .collect::<Vec<char>>();
+
+    let windows = chars.windows(2);
+
+    let mut tok = String::new();
+
+    let mut vec: Vec<String> = Vec::new();
+
+    for w in windows {
+        let a = w[0];
+        let b = w[1];
+        tok.push(a);
+        if (a.is_alphabetic() && b.is_numeric()) || (a.is_numeric() && b.is_alphabetic()) {
+            if !tok.is_empty() {
+                vec.push(tok.clone());
+                tok.clear();
+            }
+        }
+    }
+    tok.push(*chars.last().unwrap());
+    if !tok.is_empty() {
+        vec.push(tok.clone());
+    }
+    vec
 }
 
 impl HumanTime {
@@ -28,41 +51,41 @@ impl HumanTime {
         let tokens = get_tokens(s);
 
         if tokens.len() % 2 != 0 {
-            anyhow::bail!("f")
+            anyhow::bail!("incorrect number of tokens");
         }
 
         let mut n: u32 = 0;
 
         for t in tokens {
-            match t {
+            match t.to_lowercase().as_str() {
                 num if num.chars().all(char::is_numeric) => n = num.parse::<u32>()?,
                 "y" | "yr" | "yrs" | "year" | "years" => {
                     res.years += n;
-                    n = 0
+                    n = 0;
                 },
                 "mo" | "mos" | "mon" | "month" | "months" => {
                     res.months += n;
-                    n = 0
+                    n = 0;
                 },
                 "w" | "wk" | "week" | "weeks" => {
                     res.weeks += n;
-                    n = 0
+                    n = 0;
                 },
                 "d" | "day" | "days" => {
                     res.days += n;
-                    n = 0
+                    n = 0;
                 },
                 "h" | "hr" | "hrs" | "hour" | "hours" => {
                     res.hours += n;
-                    n = 0
+                    n = 0;
                 },
                 "m" | "min" | "mins" | "minute" | "minutes" => {
                     res.minutes += n;
-                    n = 0
+                    n = 0;
                 },
                 "s" | "sec" | "secs" | "second" | "seconds" => {
                     res.seconds += n;
-                    n = 0
+                    n = 0;
                 },
                 _ => (),
             }
@@ -108,18 +131,23 @@ pub trait CheckedAddHumanTime {
 impl CheckedAddHumanTime for NaiveDateTime {
     fn checked_add(self, rhs: HumanTime) -> Result<Self> {
         let mut a = self;
+
         a = a
             .checked_add_months(Months::new(rhs.months + rhs.years * 12))
             .context("checked add overflow")?;
+
         a = a
             .checked_add_days(Days::new((rhs.days + rhs.weeks * 7).into()))
             .context("checked add overflow")?;
+
         a = a
             .checked_add_signed(Duration::hours(rhs.hours.into()))
             .context("checked add overflow")?;
+
         a = a
             .checked_add_signed(Duration::minutes(rhs.minutes.into()))
             .context("checked add overflow")?;
+
         a = a
             .checked_add_signed(Duration::seconds(rhs.seconds.into()))
             .context("checked add overflow")?;
@@ -130,61 +158,68 @@ impl CheckedAddHumanTime for NaiveDateTime {
 
 impl Display for HumanTime {
     fn fmt(&self, fmt: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let mut res = String::new();
         if self.years > 0 {
-            fmt.write_str(&format!(
-                "{} year{}",
+            res += &format!(
+                "{}yr{} ",
                 self.years.to_string(),
                 if self.years > 1 { "s" } else { "" }
-            ))?;
+            );
         }
 
         if self.months > 0 {
-            fmt.write_str(&format!(
-                "{} month{}",
+            res += &format!(
+                "{}mo{} ",
                 self.months.to_string(),
                 if self.months > 1 { "s" } else { "" }
-            ))?;
+            );
         }
 
         if self.weeks > 0 {
-            fmt.write_str(&format!(
-                "{} week{}",
+            res += &format!(
+                "{}wk{} ",
                 self.weeks.to_string(),
                 if self.weeks > 1 { "s" } else { "" }
-            ))?;
+            );
         }
 
         if self.days > 0 {
-            fmt.write_str(&format!(
-                "{} day{}",
+            res += &format!(
+                "{}day{} ",
                 self.days.to_string(),
                 if self.days > 1 { "s" } else { "" }
-            ))?;
+            );
         }
 
         if self.hours > 0 {
-            fmt.write_str(&format!(
-                "{} hour{}",
+            res += &format!(
+                "{}hr{} ",
                 self.hours.to_string(),
                 if self.hours > 1 { "s" } else { "" }
-            ))?;
+            );
         }
 
         if self.minutes > 0 {
-            fmt.write_str(&format!(
-                "{} minute{}",
+            res += &format!(
+                "{}min{} ",
                 self.minutes.to_string(),
                 if self.minutes > 1 { "s" } else { "" }
-            ))?;
+            );
         }
 
         if self.seconds > 0 {
-            fmt.write_str(&format!(
-                "{} second{}",
+            res += &format!(
+                "{}sec{} ",
                 self.seconds.to_string(),
                 if self.seconds > 1 { "s" } else { "" }
-            ))?;
+            );
         }
+
+        if res.ends_with(" ") {
+            res.pop();
+        }
+
+        fmt.write_str(&res)?;
 
         Ok(())
     }
@@ -193,7 +228,7 @@ impl Display for HumanTime {
 #[cfg(test)]
 mod tests {
     #[test]
-    fn debug_normal() {
+    fn parse_with_spaces() {
         assert_eq!(
             format!("{:?}", super::HumanTime::parse("3 min 2 sec 50 hr")),
             "Ok(HumanTime { years: 0, months: 0, weeks: 0, days: 0, hours: 50, minutes: 3, seconds: 2 })"
@@ -201,10 +236,120 @@ mod tests {
     }
 
     #[test]
-    fn debug_no() {
+    fn parse_no_spaces() {
         assert_eq!(
-            format!("{:?}", super::HumanTime::parse("3 min 2 sec 50 hr")),
+            format!("{:?}", super::HumanTime::parse("3min2sec50hr")),
             "Ok(HumanTime { years: 0, months: 0, weeks: 0, days: 0, hours: 50, minutes: 3, seconds: 2 })"
+        );
+    }
+
+    #[test]
+    fn parse_all_short_no_spaces() {
+        assert_eq!(
+            format!("{:?}", super::HumanTime::parse("30s8m7h3d2w9mo3y").unwrap()),
+            "HumanTime { years: 3, months: 9, weeks: 2, days: 3, hours: 7, minutes: 8, seconds: 30 }"
+        );
+    }
+
+    #[test]
+    fn parse_all_long_no_spaces() {
+        assert_eq!(
+            format!(
+                "{:?}",
+                super::HumanTime::parse("30seconds8minutes7hours3days2weeks9months3years").unwrap()
+            ),
+            "HumanTime { years: 3, months: 9, weeks: 2, days: 3, hours: 7, minutes: 8, seconds: 30 }"
+        );
+    }
+
+    #[test]
+    fn parse_all_short_with_spaces() {
+        assert_eq!(
+            format!(
+                "{:?}",
+                super::HumanTime::parse("30 s 8 m 7 h 3 d 2 w 9 mo 3 y").unwrap()
+            ),
+            "HumanTime { years: 3, months: 9, weeks: 2, days: 3, hours: 7, minutes: 8, seconds: 30 }"
+        );
+    }
+
+    #[test]
+    fn parse_all_long_with_spaces() {
+        assert_eq!(
+            format!(
+                "{:?}",
+                super::HumanTime::parse(
+                    " 30seconds 8 minutes7hours 3days    2weeks  9months3        years"
+                )
+                .unwrap()
+            ),
+            "HumanTime { years: 3, months: 9, weeks: 2, days: 3, hours: 7, minutes: 8, seconds: 30 }"
+        );
+    }
+
+    #[test]
+    fn parse_all_short_no_spaces_mixed() {
+        assert_eq!(
+            format!("{:?}", super::HumanTime::parse("7h3y3d9mo8m30s2w").unwrap()),
+            "HumanTime { years: 3, months: 9, weeks: 2, days: 3, hours: 7, minutes: 8, seconds: 30 }"
+        );
+    }
+
+    #[test]
+    fn display_normal() {
+        assert_eq!(
+            format!("{}", super::HumanTime::parse("30s8m7h3d2w9mo3y").unwrap()),
+            "3yrs 9mos 2wks 3days 7hrs 8mins 30secs"
+        );
+    }
+
+    #[test]
+    fn cleanup_months() {
+        let mut a = super::HumanTime::parse("100months").unwrap();
+        a.cleanup();
+        assert_eq!(
+            format!("{:?}", a),
+            "HumanTime { years: 8, months: 4, weeks: 0, days: 0, hours: 0, minutes: 0, seconds: 0 }"
+        );
+    }
+
+    #[test]
+    fn cleanup_days() {
+        let mut a = super::HumanTime::parse("100days").unwrap();
+        a.cleanup();
+        assert_eq!(
+            format!("{:?}", a),
+            "HumanTime { years: 0, months: 0, weeks: 14, days: 2, hours: 0, minutes: 0, seconds: 0 }"
+        );
+    }
+
+    #[test]
+    fn cleanup_hours() {
+        let mut a = super::HumanTime::parse("100hours").unwrap();
+        a.cleanup();
+        assert_eq!(
+            format!("{:?}", a),
+            "HumanTime { years: 0, months: 0, weeks: 0, days: 4, hours: 4, minutes: 0, seconds: 0 }"
+        );
+    }
+
+    #[test]
+    fn cleanup_minutes() {
+        let mut a = super::HumanTime::parse("100minutes").unwrap();
+        a.cleanup();
+        assert_eq!(
+            format!("{:?}", a),
+            "HumanTime { years: 0, months: 0, weeks: 0, days: 0, hours: 1, minutes: 40, seconds: 0 }"
+        );
+    }
+
+    #[test]
+    fn cleanup_seconds() {
+        let mut a = super::HumanTime::parse("100seconds").unwrap();
+        a.cleanup();
+        assert_eq!(
+            format!("{:?}", a),
+            "HumanTime { years: 0, months: 0, weeks: 0, days: 0, hours: 0, minutes: 1, seconds: 40 }"
         );
     }
 }
