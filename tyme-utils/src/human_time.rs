@@ -3,7 +3,7 @@ use std::fmt::Display;
 use anyhow::{Context, Result};
 use chrono::{Days, Duration, Months, NaiveDateTime};
 
-#[derive(Default, Copy, Clone, Debug)]
+#[derive(PartialEq, Eq, Default, Copy, Clone, Debug)]
 pub struct HumanTime {
     pub years: u32,
     pub months: u32,
@@ -42,8 +42,8 @@ fn get_tokens(s: &str) -> Vec<String> {
         }
     }
 
-    #[allow(clippy::unwrap_used)]
     // guaranteed not to error, because s is at least 2 chars long
+    #[allow(clippy::unwrap_used)]
     tok.push(*chars.last().unwrap());
 
     if !tok.is_empty() {
@@ -58,7 +58,7 @@ impl HumanTime {
 
         let tokens = get_tokens(s);
 
-        if tokens.len() % 2 != 0 {
+        if tokens.len() % 2 != 0 || tokens.len() < 2 {
             anyhow::bail!("incorrect number of tokens");
         }
 
@@ -235,129 +235,261 @@ impl Display for HumanTime {
 
 #[cfg(test)]
 mod tests {
+    use super::HumanTime;
+
     #[test]
     fn parse_with_spaces() {
         assert_eq!(
-            format!("{:?}", super::HumanTime::parse("3 min 2 sec 50 hr")),
-            "Ok(HumanTime { years: 0, months: 0, weeks: 0, days: 0, hours: 50, minutes: 3, seconds: 2 })"
+            HumanTime::parse("3 min 2 sec 50 hr").unwrap(),
+            HumanTime {
+                years: 0,
+                months: 0,
+                weeks: 0,
+                days: 0,
+                hours: 50,
+                minutes: 3,
+                seconds: 2,
+            }
         );
     }
 
     #[test]
     fn parse_no_spaces() {
         assert_eq!(
-            format!("{:?}", super::HumanTime::parse("3min2sec50hr")),
-            "Ok(HumanTime { years: 0, months: 0, weeks: 0, days: 0, hours: 50, minutes: 3, seconds: 2 })"
+            HumanTime::parse("3min2sec50hr").unwrap(),
+            HumanTime {
+                years: 0,
+                months: 0,
+                weeks: 0,
+                days: 0,
+                hours: 50,
+                minutes: 3,
+                seconds: 2,
+            }
         );
     }
 
     #[test]
     fn parse_all_short_no_spaces() {
         assert_eq!(
-            format!("{:?}", super::HumanTime::parse("30s8m7h3d2w9mo3y").unwrap()),
-            "HumanTime { years: 3, months: 9, weeks: 2, days: 3, hours: 7, minutes: 8, seconds: 30 }"
+            HumanTime::parse("30s8m7h3d2w9mo3y").unwrap(),
+            HumanTime {
+                years: 3,
+                months: 9,
+                weeks: 2,
+                days: 3,
+                hours: 7,
+                minutes: 8,
+                seconds: 30,
+            }
         );
     }
 
     #[test]
     fn parse_all_long_no_spaces() {
         assert_eq!(
-            format!(
-                "{:?}",
-                super::HumanTime::parse("30seconds8minutes7hours3days2weeks9months3years").unwrap()
-            ),
-            "HumanTime { years: 3, months: 9, weeks: 2, days: 3, hours: 7, minutes: 8, seconds: 30 }"
+            HumanTime::parse("30seconds8minutes7hours3days2weeks9months3years").unwrap(),
+            HumanTime {
+                years: 3,
+                months: 9,
+                weeks: 2,
+                days: 3,
+                hours: 7,
+                minutes: 8,
+                seconds: 30,
+            }
         );
     }
 
     #[test]
     fn parse_all_short_with_spaces() {
         assert_eq!(
-            format!(
-                "{:?}",
-                super::HumanTime::parse("30 s 8 m 7 h 3 d 2 w 9 mo 3 y").unwrap()
-            ),
-            "HumanTime { years: 3, months: 9, weeks: 2, days: 3, hours: 7, minutes: 8, seconds: 30 }"
+            HumanTime::parse("30 s 8 m 7 h 3 d 2 w 9 mo 3 y").unwrap(),
+            HumanTime {
+                years: 3,
+                months: 9,
+                weeks: 2,
+                days: 3,
+                hours: 7,
+                minutes: 8,
+                seconds: 30,
+            }
         );
     }
 
     #[test]
     fn parse_all_long_with_spaces() {
         assert_eq!(
-            format!(
-                "{:?}",
-                super::HumanTime::parse(
-                    " 30seconds 8 minutes7hours 3days    2weeks  9months3        years"
-                )
-                .unwrap()
-            ),
-            "HumanTime { years: 3, months: 9, weeks: 2, days: 3, hours: 7, minutes: 8, seconds: 30 }"
+            HumanTime::parse(" 30seconds 8 minutes7hours 3days 2weeks  9months3    years").unwrap(),
+            HumanTime {
+                years: 3,
+                months: 9,
+                weeks: 2,
+                days: 3,
+                hours: 7,
+                minutes: 8,
+                seconds: 30,
+            }
         );
     }
 
     #[test]
     fn parse_all_short_no_spaces_mixed() {
         assert_eq!(
-            format!("{:?}", super::HumanTime::parse("7h3y3d9mo8m30s2w").unwrap()),
-            "HumanTime { years: 3, months: 9, weeks: 2, days: 3, hours: 7, minutes: 8, seconds: 30 }"
+            HumanTime::parse("7h3y3d9mo8m30s2w").unwrap(),
+            HumanTime {
+                years: 3,
+                months: 9,
+                weeks: 2,
+                days: 3,
+                hours: 7,
+                minutes: 8,
+                seconds: 30,
+            }
         );
+    }
+
+    #[test]
+    fn parse_err_simple() {
+        assert!(HumanTime::parse("abc").is_err());
+    }
+
+    #[test]
+    fn parse_err_one_char() {
+        assert!(HumanTime::parse("a").is_err());
+    }
+
+    #[test]
+    fn parse_err_one_digit() {
+        assert!(HumanTime::parse("1").is_err());
+    }
+
+    #[test]
+    fn parse_err_empty() {
+        assert!(HumanTime::parse("").is_err());
+    }
+
+    #[test]
+    fn parse_err_mixed() {
+        assert_eq!(
+            HumanTime::parse("3 min 7 abc").unwrap(),
+            HumanTime {
+                years: 0,
+                months: 0,
+                weeks: 0,
+                days: 0,
+                hours: 0,
+                minutes: 3,
+                seconds: 0,
+            }
+        );
+    }
+
+    #[test]
+    fn parse_err_overflow() {
+        assert!(HumanTime::parse("3 min 2131283123128397893782737 abc").is_err());
     }
 
     #[test]
     fn display_normal() {
         assert_eq!(
-            format!("{}", super::HumanTime::parse("30s8m7h3d2w9mo3y").unwrap()),
+            HumanTime::parse("30s8m7h3d2w9mo3y").unwrap().to_string(),
             "3yrs 9mos 2wks 3days 7hrs 8mins 30secs"
         );
     }
 
     #[test]
     fn cleanup_months() {
-        let mut a = super::HumanTime::parse("100months").unwrap();
+        let mut a = HumanTime::parse("100months").unwrap();
         a.cleanup();
+
         assert_eq!(
-            format!("{:?}", a),
-            "HumanTime { years: 8, months: 4, weeks: 0, days: 0, hours: 0, minutes: 0, seconds: 0 }"
+            a,
+            HumanTime {
+                years: 8,
+                months: 4,
+                weeks: 0,
+                days: 0,
+                hours: 0,
+                minutes: 0,
+                seconds: 0,
+            }
         );
     }
 
     #[test]
     fn cleanup_days() {
-        let mut a = super::HumanTime::parse("100days").unwrap();
+        let mut a = HumanTime::parse("100days").unwrap();
         a.cleanup();
+
         assert_eq!(
-            format!("{:?}", a),
-            "HumanTime { years: 0, months: 0, weeks: 14, days: 2, hours: 0, minutes: 0, seconds: 0 }"
+            a,
+            HumanTime {
+                years: 0,
+                months: 0,
+                weeks: 14,
+                days: 2,
+                hours: 0,
+                minutes: 0,
+                seconds: 0,
+            }
         );
     }
 
     #[test]
     fn cleanup_hours() {
-        let mut a = super::HumanTime::parse("100hours").unwrap();
+        let mut a = HumanTime::parse("100hours").unwrap();
         a.cleanup();
+
         assert_eq!(
-            format!("{:?}", a),
-            "HumanTime { years: 0, months: 0, weeks: 0, days: 4, hours: 4, minutes: 0, seconds: 0 }"
+            a,
+            HumanTime {
+                years: 0,
+                months: 0,
+                weeks: 0,
+                days: 4,
+                hours: 4,
+                minutes: 0,
+                seconds: 0,
+            }
         );
     }
 
     #[test]
     fn cleanup_minutes() {
-        let mut a = super::HumanTime::parse("100minutes").unwrap();
+        let mut a = HumanTime::parse("100minutes").unwrap();
         a.cleanup();
+
         assert_eq!(
-            format!("{:?}", a),
-            "HumanTime { years: 0, months: 0, weeks: 0, days: 0, hours: 1, minutes: 40, seconds: 0 }"
+            a,
+            HumanTime {
+                years: 0,
+                months: 0,
+                weeks: 0,
+                days: 0,
+                hours: 1,
+                minutes: 40,
+                seconds: 0
+            }
         );
     }
 
     #[test]
     fn cleanup_seconds() {
-        let mut a = super::HumanTime::parse("100seconds").unwrap();
+        let mut a = HumanTime::parse("100seconds").unwrap();
         a.cleanup();
+
         assert_eq!(
-            format!("{:?}", a),
-            "HumanTime { years: 0, months: 0, weeks: 0, days: 0, hours: 0, minutes: 1, seconds: 40 }"
+            a,
+            HumanTime {
+                years: 0,
+                months: 0,
+                weeks: 0,
+                days: 0,
+                hours: 0,
+                minutes: 1,
+                seconds: 40,
+            }
         );
     }
 }
