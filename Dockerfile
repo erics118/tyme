@@ -7,8 +7,8 @@ WORKDIR /app
 
 COPY . .
 
-RUN --mount=type=cache,id=tKk1ioHC9sU-/root/cargo/git,target=/root/.cargo/git \
-    --mount=type=cache,id=tKk1ioHC9sU-/root/cargo/registry,target=/root/.cargo/registry \
+RUN --mount=type=cache,id=5c1d818e-af74-40ea-8dfb-6d36cd409d9a-/root/cargo/git,target=/root/.cargo/git \
+    --mount=type=cache,id=5c1d818e-af74-40ea-8dfb-6d36cd409d9a-/root/cargo/registry,target=/root/.cargo/registry \
     cargo build --release --package tyme-discord
 
 FROM debian:buster-slim
