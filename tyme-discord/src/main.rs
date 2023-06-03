@@ -16,6 +16,8 @@ pub mod macros;
 pub mod messages;
 pub mod setup;
 
+use std::sync::Arc;
+
 use anyhow::{Context as _, Result};
 use dotenvy::dotenv;
 use serenity::{client::Client, model::gateway::GatewayIntents};
@@ -63,7 +65,7 @@ async fn main() -> Result<()> {
     {
         let mut data = client.data.write().await;
 
-        data.insert::<Database>(Mutex::new(pool));
+        data.insert::<Database>(Arc::new(Mutex::new(pool)));
     }
 
     client.start().await?;
