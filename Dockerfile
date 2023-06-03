@@ -1,5 +1,8 @@
 FROM rust:1-slim-buster AS builder
 
+ARG DATABASE_URL
+ENV DATABASE_URL=$DATABASE_URL
+
 WORKDIR /app
 
 COPY . .

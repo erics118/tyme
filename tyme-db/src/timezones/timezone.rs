@@ -14,7 +14,7 @@ impl Timezone {
     pub async fn get(pool: &Mutex<sqlx::PgPool>, user_id: UserId) -> Result<Self> {
         let pool = pool.lock().await;
 
-        let record = sqlx::query!(
+        let row = sqlx::query!(
             r#"
             SELECT timezone
             FROM timezones
@@ -26,36 +26,42 @@ impl Timezone {
         .await?
         .context("does not exist")?;
 
-        let timezone = Tz::from_str_insensitive(&record.timezone)
+        let timezone = Tz::from_str_insensitive(&row.timezone)
             .map_err(|_| anyhow::anyhow!("database corrupted, timezone invalid"))?;
 
         Ok(Self { user_id, timezone })
     }
 
-    pub async fn set(&self, pool: &Mutex<sqlx::PgPool>) -> Result<()> {
+    pub async fn set(&self, pool: &Mutex<sqlx::PgPool>) -> Result<Self> {
         let pool = pool.lock().await;
 
         // either update row or create new row
-        sqlx::query!(
+        let row = sqlx::query!(
             r#"
             INSERT INTO timezones (user_id, timezone)
             VALUES ($1::BIGINT, $2::TEXT)
             ON CONFLICT (user_id)
-            DO UPDATE SET timezone = EXCLUDED.timezone;
+            DO UPDATE SET timezone = EXCLUDED.timezone
+            RETURNING *;
             "#,
             i64::from(self.user_id),
             self.timezone.name()
         )
-        .fetch_optional(&*pool)
+        .fetch_one(&*pool)
         .await?;
 
-        Ok(())
+        let timezone = Tz::from_str_insensitive(&row.timezone)
+            .map_err(|_| anyhow::anyhow!("database corrupted, timezone invalid"))?;
+
+        let user_id = UserId::from(row.user_id as u64);
+
+        Ok(Self { user_id, timezone })
     }
 
     pub async fn delete(pool: &Mutex<sqlx::PgPool>, user_id: UserId) -> Result<Self> {
         let pool = pool.lock().await;
 
-        let record = sqlx::query!(
+        let row = sqlx::query!(
             r#"
             DELETE FROM timezones
             WHERE user_id = $1::BIGINT
@@ -67,7 +73,7 @@ impl Timezone {
         .await?
         .context("does not exist")?;
 
-        let timezone = Tz::from_str_insensitive(&record.timezone)
+        let timezone = Tz::from_str_insensitive(&row.timezone)
             .map_err(|_| anyhow::anyhow!("database corrupted, timezone invalid"))?;
 
         Ok(Self { user_id, timezone })

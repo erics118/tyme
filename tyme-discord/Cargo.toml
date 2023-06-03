@@ -39,6 +39,7 @@ features = [
     "uuid",
     "chrono",
     "tls",
+    "offline",
 ]
 
 [dependencies.chrono-tz]
