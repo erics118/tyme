@@ -9,9 +9,7 @@ tyme-utils = { path = "../tyme-utils" }
 anyhow = { version = "1.0.71", features = ["backtrace"] }
 chrono = { version = "0.4.26", features = ["serde"] }
 log = "0.4.18"
-serde = "1.0.163"
 tokio = { version = "1.28.2", features = ["full"] }
-uuid = { version = "1.3.3", features = ["v4", "serde"] }
 
 [dependencies.serenity]
 git = "https://github.com/serenity-rs/serenity"
@@ -26,18 +24,18 @@ features = [
     "model",
     "utils",
     "rustls_backend",
+    "chrono",
+    "interactions_endpoint",
 ]
 
 [dependencies.sqlx]
-version = "0.6"
+version = "0.6.3"
 features = [
     "runtime-tokio-rustls",
-    "postgres",
+    "mysql",
     "macros",
-    "uuid",
+    "migrate",
     "chrono",
-    "tls",
-    "offline",
 ]
 
 [dependencies.chrono-tz]

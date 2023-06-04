@@ -21,8 +21,8 @@ use std::sync::Arc;
 use anyhow::{Context as _, Result};
 use dotenvy::dotenv;
 use serenity::{client::Client, model::gateway::GatewayIntents};
-use sqlx::postgres::PgPoolOptions;
 use tokio::sync::Mutex;
+use tyme_db::MySqlPoolOptions;
 
 use crate::{
     data::database::Database,
@@ -47,7 +47,7 @@ async fn main() -> Result<()> {
 
     log::info!("Connecting to database");
 
-    let pool = PgPoolOptions::new().connect(&database_url).await?;
+    let pool = MySqlPoolOptions::new().connect(&database_url).await?;
 
     log::info!("Database connection successful");
 

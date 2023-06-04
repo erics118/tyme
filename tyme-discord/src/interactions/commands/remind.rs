@@ -12,7 +12,6 @@ use serenity::{
 };
 use tyme_db::{reminders::reminder::Reminder, timezones::timezone::Timezone};
 use tyme_utils::human_time::{HumanTime, CheckedAddHumanTime};
-use uuid::Uuid;
 
 use crate::data::database::Database;
 
@@ -86,7 +85,7 @@ pub async fn run(ctx: Context, command: CommandInteraction) -> Result<()> {
 
     // create reminder
     let r = Reminder {
-        id: Uuid::new_v4(),
+        id: None,
         created_at: Utc::now().naive_utc(),
         time: now,
         message: description.to_string(),

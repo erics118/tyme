@@ -13,7 +13,6 @@ dotenvy = "0.15.7"
 env_logger = "0.10.0"
 log = "0.4.18"
 tokio = { version = "1.28.2", features = ["full"] }
-uuid = { version = "1.3.3", features = ["v4"] }
 
 [dependencies.serenity]
 git = "https://github.com/serenity-rs/serenity"
@@ -28,20 +27,10 @@ features = [
     "model",
     "utils",
     "rustls_backend",
-]
-
-[dependencies.sqlx]
-version = "0.6"
-features = [
-    "runtime-tokio-rustls",
-    "postgres",
-    "macros",
-    "uuid",
     "chrono",
-    "tls",
-    "offline",
+    "interactions_endpoint",
 ]
 
 [dependencies.chrono-tz]
 version = "0.8.2"
-features = ["std", "case-insensitive", "serde"]
+features = ["std", "case-insensitive"]

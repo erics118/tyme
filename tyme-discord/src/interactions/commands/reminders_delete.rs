@@ -7,7 +7,6 @@ use serenity::{
     client::Context,
 };
 use tyme_db::reminders::reminder::Reminder;
-use uuid::Uuid;
 
 use crate::data::database::Database;
 
@@ -22,7 +21,7 @@ pub async fn run(ctx: Context, command: CommandInteraction) -> Result<()> {
         anyhow::bail!("incorrect resolved option type")
     };
 
-    let Ok (id) = Uuid::from_str(id) else {
+    let Ok (id) = u32::from_str(id) else {
         command
         .create_response(
             &ctx.http,
@@ -42,10 +41,8 @@ pub async fn run(ctx: Context, command: CommandInteraction) -> Result<()> {
         .context("Expected `Database` in TypeMap")?;
 
     let res = match Reminder::delete_one_by_id(pool, id).await {
-        Ok(r) => format!(
-            "Your reminder `{}`, set {}, created {} has been deleted",
-            r.message, r.time, r.created_at
-        ),
+        // TODO: fetch the deleted reminder and show what was deleted
+        Ok(_) => format!("deleted"),
         Err(_) => format!("Reminder with id `{}` does not exist", id),
     };
 

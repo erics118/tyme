@@ -27,7 +27,14 @@ pub async fn run(ctx: Context, command: CommandInteraction) -> Result<()> {
     let embed = CreateEmbed::new().title("Reminders").description(
         reminders
             .iter()
-            .map(|r| format!("{} - {} - {}", r.id, r.message, r.time.pretty(timezone)))
+            .map(|r| {
+                format!(
+                    "{} - {} - {}",
+                    r.id.unwrap_or(7057),
+                    r.message,
+                    r.time.pretty(timezone)
+                )
+            })
             .collect::<Vec<_>>()
             .join("\n"),
     );

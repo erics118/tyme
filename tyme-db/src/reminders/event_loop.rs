@@ -2,12 +2,12 @@ use std::time::Duration;
 
 use chrono::Utc;
 use serenity::{builder::CreateMessage, http::CacheHttp, prelude::Mentionable};
+use sqlx::MySqlPool;
 use tokio::{sync::Mutex, time::sleep};
 use tyme_utils::timestamp::{DiscordTimestamp, TimestampFormat};
 
 use super::reminder::Reminder;
-
-pub async fn event_reminder_loop(pool: Mutex<sqlx::PgPool>, http: impl CacheHttp) {
+pub async fn event_reminder_loop(pool: Mutex<MySqlPool>, http: impl CacheHttp) {
     loop {
         // Retrieve events from the database
         #[allow(clippy::unwrap_used)]

@@ -1,24 +1,24 @@
 use anyhow::{Context, Result};
 use chrono_tz::Tz;
-use serde::{Deserialize, Serialize};
 use serenity::model::id::UserId;
+use sqlx::MySqlPool;
 use tokio::sync::Mutex;
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone)]
 pub struct Timezone {
     pub user_id: UserId,
     pub timezone: Tz,
 }
 
 impl Timezone {
-    pub async fn get(pool: &Mutex<sqlx::PgPool>, user_id: UserId) -> Result<Self> {
+    pub async fn get(pool: &Mutex<MySqlPool>, user_id: UserId) -> Result<Self> {
         let pool = pool.lock().await;
 
         let row = sqlx::query!(
             r#"
             SELECT timezone
             FROM timezones
-            WHERE user_id = $1::BIGINT;
+            WHERE user_id = ?;
             "#,
             i64::from(user_id),
         )
@@ -32,50 +32,37 @@ impl Timezone {
         Ok(Self { user_id, timezone })
     }
 
-    pub async fn set(&self, pool: &Mutex<sqlx::PgPool>) -> Result<Self> {
+    pub async fn set(&self, pool: &Mutex<MySqlPool>) -> Result<()> {
         let pool = pool.lock().await;
 
         // either update row or create new row
-        let row = sqlx::query!(
+        sqlx::query!(
             r#"
             INSERT INTO timezones (user_id, timezone)
-            VALUES ($1::BIGINT, $2::TEXT)
-            ON CONFLICT (user_id)
-            DO UPDATE SET timezone = EXCLUDED.timezone
-            RETURNING *;
+            VALUES (?, ?)
+            ON DUPLICATE KEY UPDATE timezone = VALUES(timezone);
             "#,
             i64::from(self.user_id),
             self.timezone.name()
         )
-        .fetch_one(&*pool)
+        .execute(&*pool)
         .await?;
 
-        let timezone = Tz::from_str_insensitive(&row.timezone)
-            .map_err(|_| anyhow::anyhow!("database corrupted, timezone invalid"))?;
-
-        let user_id = UserId::from(row.user_id as u64);
-
-        Ok(Self { user_id, timezone })
+        Ok(())
     }
 
-    pub async fn delete(pool: &Mutex<sqlx::PgPool>, user_id: UserId) -> Result<Self> {
+    pub async fn delete(pool: &Mutex<MySqlPool>, user_id: UserId) -> Result<()> {
         let pool = pool.lock().await;
 
-        let row = sqlx::query!(
+        sqlx::query!(
             r#"
             DELETE FROM timezones
-            WHERE user_id = $1::BIGINT
-            RETURNING *;
+            WHERE user_id = ?;
             "#,
             i64::from(user_id),
         )
-        .fetch_optional(&*pool)
-        .await?
-        .context("does not exist")?;
-
-        let timezone = Tz::from_str_insensitive(&row.timezone)
-            .map_err(|_| anyhow::anyhow!("database corrupted, timezone invalid"))?;
-
-        Ok(Self { user_id, timezone })
+        .execute(&*pool)
+        .await?;
+        Ok(())
     }
 }

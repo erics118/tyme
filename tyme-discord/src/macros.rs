@@ -26,7 +26,7 @@ macro_rules! interaction_commands {
         use serenity::{
             client::Context,
             http::Http,
-            model::application::CommandInteraction,
+            model::application::{Command, CommandInteraction},
         };
 
         $(pub mod $cmd;)*
@@ -44,7 +44,7 @@ macro_rules! interaction_commands {
 
         // adding the + Send + Sync fixes the clippy::future_not_send diagnostic
         pub async fn register_all(http: impl AsRef<Http> + Send + Sync)  -> Result<()> {
-            let _ = serenity::all::Command::set_global_commands(
+            let _ = Command::set_global_commands(
                 http,
                 vec![
                     $($crate::interactions::commands::$cmd::register(),)*

@@ -15,15 +15,5 @@ pub async fn run(_ctx: Context, command: CommandInteraction) -> Result<()> {
         anyhow::bail!("incorrect resolved option type")
     };
 
-    // command
-    //     .create_response(
-    //         &ctx.http,
-    //         CreateInteractionResponse::Autocomplete(
-    //             CreateAutocompleteResponse::new().set_choices(),
-    //         ),
-    //     )
-    //     .await?;
-    // todo!()
-
     Ok(())
 }
