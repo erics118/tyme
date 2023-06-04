@@ -29,7 +29,7 @@ impl Reminder {
             self.message,
             i64::from(self.user_id),
             i64::from(self.channel_id),
-            self.guild_id.map(|a| i64::from(a)),
+            self.guild_id.map(i64::from),
         )
         .execute(&*pool)
         .await?
