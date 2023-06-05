@@ -38,18 +38,19 @@ pub async fn run(ctx: Context, command: CommandInteraction) -> Result<()> {
         },
     };
 
-    let data = ctx.data.read().await;
-
-    let db = data
-        .get::<Database>()
-        .context("Expected `Database` in TypeMap")?;
+    let db = {
+        let data = ctx.data.read().await;
+        data.get::<Database>()
+            .context("Expected `Database` in TypeMap")?
+            .clone()
+    };
 
     let t = Timezone {
         user_id: command.user.id,
         timezone,
     };
 
-    t.set(db).await?;
+    t.set(&db).await?;
 
     command
         .create_response(

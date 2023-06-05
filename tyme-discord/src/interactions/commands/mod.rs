@@ -1,3 +1,5 @@
+//! Interaction commands.
+
 use crate::interaction_commands;
 
 interaction_commands!(test, remind, reminders, timezone);

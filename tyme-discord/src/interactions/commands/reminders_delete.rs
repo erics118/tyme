@@ -34,13 +34,14 @@ pub async fn run(ctx: Context, command: CommandInteraction) -> Result<()> {
         return Ok(());
     };
 
-    let data = ctx.data.read().await;
+    let db = {
+        let data = ctx.data.read().await;
+        data.get::<Database>()
+            .context("Expected `Database` in TypeMap")?
+            .clone()
+    };
 
-    let db = data
-        .get::<Database>()
-        .context("Expected `Database` in TypeMap")?;
-
-    let res = match Reminder::delete_one_by_id(db, id).await {
+    let res = match Reminder::delete_one_by_id(&db, id).await {
         // TODO: fetch the deleted reminder and show what was deleted
         Ok(_) => format!("deleted"),
         Err(_) => format!("Reminder with id `{}` does not exist", id),

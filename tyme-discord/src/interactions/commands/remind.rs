@@ -11,9 +11,11 @@ use serenity::{
     model::application::CommandOptionType,
 };
 use tyme_db::{Reminder, Timezone};
-use crate::utils::human_time::{HumanTime, CheckedAddHumanTime};
 
-use crate::data::database::Database;
+use crate::{
+    data::database::Database,
+    utils::human_time::{CheckedAddHumanTime, HumanTime},
+};
 
 pub fn register() -> CreateCommand {
     CreateCommand::new("remind")
@@ -43,14 +45,15 @@ pub async fn run(ctx: Context, command: CommandInteraction) -> Result<()> {
         anyhow::bail!("incorrect resolved option type")
     };
 
-    let data = ctx.data.read().await;
-
-    let db = data
-        .get::<Database>()
-        .context("Expected `Database` in TypeMap")?;
+    let db = {
+        let data = ctx.data.read().await;
+        data.get::<Database>()
+            .context("Expected `Database` in TypeMap")?
+            .clone()
+    };
 
     // get user's timezone
-    let timezone: Tz = Timezone::get(db, command.user.id)
+    let timezone: Tz = Timezone::get(&db, command.user.id)
         .await
         .map_or_else(|_| Tz::UTC, |t| t.timezone);
 
@@ -66,7 +69,7 @@ pub async fn run(ctx: Context, command: CommandInteraction) -> Result<()> {
                 ),
             )
             .await?;
-        
+
         return Ok(());
     };
 
@@ -79,7 +82,7 @@ pub async fn run(ctx: Context, command: CommandInteraction) -> Result<()> {
             ),
         )
         .await?;
-    
+
         return Ok(());
     };
 
@@ -94,7 +97,7 @@ pub async fn run(ctx: Context, command: CommandInteraction) -> Result<()> {
         guild_id: command.guild_id,
     };
 
-    r.create(db).await?;
+    r.create(&db).await?;
 
     let msg = format!(
         "Reminder set for {} on **{}**",

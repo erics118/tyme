@@ -1,19 +1,39 @@
+//! Nice, humanized duration parsing and formatting.
+//!
+//! It is used to parse a string into a human readable time, store it in a nice
+//! struct, and also to convert it back into a string.
+
 use std::fmt::Display;
 
 use anyhow::{Context, Result};
 use chrono::{Days, Duration, Months, NaiveDateTime};
 
+/// Struct that represents a human understandable time.
 #[derive(PartialEq, Eq, Default, Copy, Clone, Debug)]
 pub struct HumanTime {
+    /// The number of years.
     pub years: u32,
+
+    /// The number of months.
     pub months: u32,
+
+    /// The number of weeks.
     pub weeks: u32,
+
+    /// The number of days.
     pub days: u32,
+
+    /// The number of hours.
     pub hours: u32,
+
+    /// The number of minutes.
     pub minutes: u32,
+
+    /// The number of seconds.
     pub seconds: u32,
 }
 
+/// Tokenize a string into parsable tokens.
 fn get_tokens(s: &str) -> Vec<String> {
     if s.len() < 2 {
         return Vec::new();
@@ -53,6 +73,7 @@ fn get_tokens(s: &str) -> Vec<String> {
 }
 
 impl HumanTime {
+    /// Parse a string into a `HumanTime`.
     pub fn parse(s: &str) -> Result<Self> {
         let mut res = Self::default();
 
@@ -102,6 +123,7 @@ impl HumanTime {
         Ok(res)
     }
 
+    /// Make each field have the lowest possible value, to be easily understood.
     pub fn cleanup(&mut self) {
         if self.seconds >= 60 {
             self.minutes += self.seconds / 60;
@@ -130,7 +152,13 @@ impl HumanTime {
     }
 }
 
+/// Trait to add a `HumanTime` to a `NaiveDateTime`.
 pub trait CheckedAddHumanTime {
+    /// Add a `HumanTime` to a `NaiveDateTime`.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the addition overflows.
     fn checked_add(self, a: HumanTime) -> Result<Self>
     where
         Self: Sized;

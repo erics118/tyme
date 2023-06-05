@@ -1,7 +1,7 @@
 use serenity::prelude::TypeMapKey;
 use tyme_db::MySqlPool;
 
-#[derive(Debug)]
+#[derive(Debug, Copy, Clone)]
 pub struct Database;
 
 impl TypeMapKey for Database {

@@ -10,16 +10,17 @@ use tyme_db::{Reminder, Timezone};
 use crate::{data::database::Database, utils::pretty::Pretty};
 
 pub async fn run(ctx: Context, command: CommandInteraction) -> Result<()> {
-    let data = ctx.data.read().await;
+    let db = {
+        let data = ctx.data.read().await;
+        data.get::<Database>()
+            .context("Expected `Database` in TypeMap")?
+            .clone()
+    };
 
-    let db = data
-        .get::<Database>()
-        .context("Expected `Database` in TypeMap")?;
-
-    let reminders = Reminder::get_all_by_user_id(db, command.user.id).await?;
+    let reminders = Reminder::get_all_by_user_id(&db, command.user.id).await?;
 
     // get user's timezone
-    let timezone: Tz = Timezone::get(db, command.user.id)
+    let timezone: Tz = Timezone::get(&db, command.user.id)
         .await
         .map_or_else(|_| Tz::UTC, |t| t.timezone);
 

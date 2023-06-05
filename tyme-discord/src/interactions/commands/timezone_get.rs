@@ -9,16 +9,17 @@ use tyme_db::Timezone;
 use crate::data::database::Database;
 
 pub async fn run(ctx: Context, command: CommandInteraction) -> Result<()> {
-    let data = ctx.data.read().await;
-
-    let db = data
-        .get::<Database>()
-        .context("Expected `Database` in TypeMap")?;
-
-    let res = match Timezone::get(db, command.user.id).await {
-        Ok(t) => format!("Your timezone is `{}`", t.timezone.name()),
-        Err(_) => "No timezone is set".to_string(),
+    let db = {
+        let data = ctx.data.read().await;
+        data.get::<Database>()
+            .context("Expected `Database` in TypeMap")?
+            .clone()
     };
+
+    let res = Timezone::get(&db, command.user.id).await.map_or_else(
+        |_| "No timezone is set".to_string(),
+        |t| format!("Your timezone is `{}`", t.timezone.name()),
+    );
 
     command
         .create_response(

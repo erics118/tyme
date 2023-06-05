@@ -4,6 +4,8 @@ use serenity::{
     all::{CommandInteraction, ResolvedValue},
     client::Context,
 };
+
+/// Autocomplete with valid timezones.
 pub async fn run(_ctx: Context, command: CommandInteraction) -> Result<()> {
     let o = command.data.options();
 

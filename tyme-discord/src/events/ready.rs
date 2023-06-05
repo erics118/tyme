@@ -1,7 +1,6 @@
 use std::time::Duration;
 
 use anyhow::{Context as _, Result};
-
 use serenity::{
     builder::CreateMessage,
     client::Context,
@@ -53,12 +52,12 @@ pub async fn run(ctx: Context, ready: Ready) -> Result<()> {
 
     log::trace!("Set status");
 
-    let data = ctx.data.read().await;
-
-    let db = data
-        .get::<Database>()
-        .context("Expected `Database` in TypeMap")?
-        .clone();
+    let db = {
+        let data = ctx.data.read().await;
+        data.get::<Database>()
+            .context("Expected `Database` in TypeMap")?
+            .clone()
+    };
 
     tokio::spawn(async move {
         loop {

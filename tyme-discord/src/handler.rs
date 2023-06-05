@@ -6,7 +6,8 @@ use serenity::{
 
 use crate::events;
 
-#[derive(Debug)]
+/// Struct that handles all events
+#[derive(Debug, Copy, Clone)]
 pub struct Handler;
 
 #[async_trait]

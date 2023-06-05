@@ -3,13 +3,35 @@ use chrono_tz::Tz;
 use serenity::model::id::UserId;
 use sqlx::MySqlPool;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Copy)]
 pub struct Timezone {
     pub user_id: UserId,
     pub timezone: Tz,
 }
 
 impl Timezone {
+    /// Create a new `Timezone` for the given `UserId` in the database.
+    ///
+    /// # Errors
+    ///
+    /// This function will return an error if the database returns an error, or
+    /// if the user already has a `Timezone` in the database.
+    pub async fn create(db: &MySqlPool, user_id: UserId, timezone: Tz) -> Result<()> {
+        sqlx::query!(
+            r#"
+        INSERT INTO timezones (user_id, timezone)
+        VALUES (?, ?);
+        "#,
+            i64::from(user_id),
+            timezone.to_string(),
+        )
+        .execute(db)
+        .await
+        .context("failed to create timezone")?;
+
+        Ok(())
+    }
+
     pub async fn get(db: &MySqlPool, user_id: UserId) -> Result<Self> {
         let row = sqlx::query!(
             r#"
