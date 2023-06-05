@@ -1,37 +1,22 @@
+//! Timezone database model.
+
 use anyhow::{Context, Result};
 use chrono_tz::Tz;
 use serenity::model::id::UserId;
 use sqlx::MySqlPool;
 
+/// Timezone struct.
 #[derive(Debug, Clone, Copy)]
 pub struct Timezone {
+    /// The user's id.
     pub user_id: UserId,
+
+    /// The user's timezone.
     pub timezone: Tz,
 }
 
 impl Timezone {
-    /// Create a new `Timezone` for the given `UserId` in the database.
-    ///
-    /// # Errors
-    ///
-    /// This function will return an error if the database returns an error, or
-    /// if the user already has a `Timezone` in the database.
-    pub async fn create(db: &MySqlPool, user_id: UserId, timezone: Tz) -> Result<()> {
-        sqlx::query!(
-            r#"
-        INSERT INTO timezones (user_id, timezone)
-        VALUES (?, ?);
-        "#,
-            i64::from(user_id),
-            timezone.to_string(),
-        )
-        .execute(db)
-        .await
-        .context("failed to create timezone")?;
-
-        Ok(())
-    }
-
+    /// Get a user's timezone, given their user id.
     pub async fn get(db: &MySqlPool, user_id: UserId) -> Result<Self> {
         let row = sqlx::query!(
             r#"
@@ -51,6 +36,7 @@ impl Timezone {
         Ok(Self { user_id, timezone })
     }
 
+    /// Get a user's timezone, given their user id.
     pub async fn set(&self, db: &MySqlPool) -> Result<()> {
         // either update row or create new row
         sqlx::query!(
@@ -68,6 +54,7 @@ impl Timezone {
         Ok(())
     }
 
+    /// Delete a user's timezone, given their user id.
     pub async fn delete(db: &MySqlPool, user_id: UserId) -> Result<()> {
         sqlx::query!(
             r#"

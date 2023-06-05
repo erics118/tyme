@@ -1,3 +1,5 @@
+//! Ready event handler.
+
 use std::time::Duration;
 
 use anyhow::{Context as _, Result};
@@ -19,6 +21,7 @@ use crate::{
     utils::timestamp::{DiscordTimestamp, TimestampFormat},
 };
 
+/// Notify users of past reminders.
 pub async fn notify_past_reminders(db: &MySqlPool, http: impl CacheHttp) -> Result<()> {
     // Retrieve events from the database
     let reminders = Reminder::get_all_past_reminders(db).await?;
@@ -41,6 +44,7 @@ pub async fn notify_past_reminders(db: &MySqlPool, http: impl CacheHttp) -> Resu
     Ok(())
 }
 
+/// Handle the ready event.
 pub async fn run(ctx: Context, ready: Ready) -> Result<()> {
     log::info!("Bot connected as: {}", ready.user.name);
 
@@ -61,8 +65,9 @@ pub async fn run(ctx: Context, ready: Ready) -> Result<()> {
 
     tokio::spawn(async move {
         loop {
-            #[allow(clippy::unwrap_used)]
-            notify_past_reminders(&db, &ctx.http).await.unwrap();
+            notify_past_reminders(&db, &ctx.http)
+                .await
+                .unwrap_or_else(|e| log::error!("Failed to notify past reminders: {e:#?}"));
 
             sleep(Duration::from_secs(60)).await;
         }

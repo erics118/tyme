@@ -1,3 +1,5 @@
+//! Message create event handler.
+
 use anyhow::{Context as _, Result};
 use serenity::{
     client::Context,
@@ -6,6 +8,7 @@ use serenity::{
 
 use crate::messages::commands;
 
+/// Handle an message create event.
 pub async fn run(ctx: Context, message: Message) -> Result<()> {
     if message.is_own(&ctx.cache) {
         return Ok(());

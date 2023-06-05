@@ -9,6 +9,7 @@ use tyme_db::{Reminder, Timezone};
 
 use crate::{data::database::Database, utils::pretty::Pretty};
 
+/// List all reminders of a user.
 pub async fn run(ctx: Context, command: CommandInteraction) -> Result<()> {
     let db = {
         let data = ctx.data.read().await;

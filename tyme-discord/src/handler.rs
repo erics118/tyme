@@ -1,3 +1,5 @@
+//! Handlers for events.
+
 use serenity::{
     async_trait,
     client::{Context, EventHandler},

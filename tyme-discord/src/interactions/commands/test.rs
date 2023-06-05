@@ -5,10 +5,12 @@ use serenity::{
     client::Context,
 };
 
+/// Create the test command.
 pub fn register() -> CreateCommand {
     CreateCommand::new("test").description("A test command")
 }
 
+/// Handle the test command.
 pub async fn run(ctx: Context, command: CommandInteraction) -> Result<()> {
     command
         .create_response(

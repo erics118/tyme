@@ -8,6 +8,7 @@ use tyme_db::Timezone;
 
 use crate::data::database::Database;
 
+/// Get a user's timezone.
 pub async fn run(ctx: Context, command: CommandInteraction) -> Result<()> {
     let db = {
         let data = ctx.data.read().await;

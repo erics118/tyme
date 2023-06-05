@@ -62,9 +62,9 @@ fn get_tokens(s: &str) -> Vec<String> {
         }
     }
 
-    // guaranteed not to error, because s is at least 2 chars long
-    #[allow(clippy::unwrap_used)]
-    tok.push(*chars.last().unwrap());
+    if let Some(last) = chars.last() {
+        tok.push(*last);
+    }
 
     if !tok.is_empty() {
         vec.push(tok.clone());

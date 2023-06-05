@@ -17,6 +17,7 @@ use crate::{
     utils::human_time::{CheckedAddHumanTime, HumanTime},
 };
 
+/// Create the remind command.
 pub fn register() -> CreateCommand {
     CreateCommand::new("remind")
         .description("Remind you about something")
@@ -34,6 +35,7 @@ pub fn register() -> CreateCommand {
         )
 }
 
+/// Handle the remind command.
 pub async fn run(ctx: Context, command: CommandInteraction) -> Result<()> {
     let o = command.data.options();
 

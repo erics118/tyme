@@ -6,6 +6,7 @@ use serenity::{
     model::application::CommandOptionType,
 };
 
+/// Create the timezone command.
 pub fn register() -> CreateCommand {
     CreateCommand::new("timezone")
         .description("*")
@@ -33,6 +34,7 @@ pub fn register() -> CreateCommand {
         ))
 }
 
+/// Handle the timezone command.
 pub async fn run(ctx: Context, command: CommandInteraction) -> Result<()> {
     let o = command.data.options();
 

@@ -6,6 +6,7 @@ use serenity::{
     model::application::CommandOptionType,
 };
 
+/// Create the reminders command.
 pub fn register() -> CreateCommand {
     CreateCommand::new("reminders")
         .description("*")
@@ -32,6 +33,7 @@ pub fn register() -> CreateCommand {
         )
 }
 
+/// Handle the reminders command.
 pub async fn run(ctx: Context, command: CommandInteraction) -> Result<()> {
     let o = command.data.options();
 

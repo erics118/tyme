@@ -9,6 +9,7 @@ use tyme_db::Timezone;
 
 use crate::data::database::Database;
 
+/// Set a user's timezone.
 pub async fn run(ctx: Context, command: CommandInteraction) -> Result<()> {
     let o = command.data.options();
 

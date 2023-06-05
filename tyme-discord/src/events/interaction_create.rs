@@ -1,8 +1,11 @@
+//! Interaction create event handler.
+
 use anyhow::Result;
 use serenity::{client::Context, model::application::Interaction};
 
 use crate::interactions::{autocompletes, commands};
 
+/// Handle an interaction create event.
 pub async fn run(ctx: Context, interaction: Interaction) -> Result<()> {
     match interaction {
         Interaction::Command(command) => {

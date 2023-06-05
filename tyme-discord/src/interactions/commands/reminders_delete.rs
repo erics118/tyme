@@ -10,6 +10,7 @@ use tyme_db::Reminder;
 
 use crate::data::database::Database;
 
+/// Delete a reminder.
 pub async fn run(ctx: Context, command: CommandInteraction) -> Result<()> {
     let o = command.data.options();
 
