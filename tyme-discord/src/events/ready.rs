@@ -20,9 +20,9 @@ use crate::{
     utils::timestamp::{DiscordTimestamp, TimestampFormat},
 };
 
-pub async fn notify_past_reminders(pool: &MySqlPool, http: impl CacheHttp) -> Result<()> {
+pub async fn notify_past_reminders(db: &MySqlPool, http: impl CacheHttp) -> Result<()> {
     // Retrieve events from the database
-    let reminders = Reminder::get_all_past_reminders(pool).await?;
+    let reminders = Reminder::get_all_past_reminders(db).await?;
 
     for r in reminders {
         log::info!("{r:#?}");
@@ -55,7 +55,7 @@ pub async fn run(ctx: Context, ready: Ready) -> Result<()> {
 
     let data = ctx.data.read().await;
 
-    let pool = data
+    let db = data
         .get::<Database>()
         .context("Expected `Database` in TypeMap")?
         .clone();
@@ -63,7 +63,7 @@ pub async fn run(ctx: Context, ready: Ready) -> Result<()> {
     tokio::spawn(async move {
         loop {
             #[allow(clippy::unwrap_used)]
-            notify_past_reminders(&pool, &ctx.http).await.unwrap();
+            notify_past_reminders(&db, &ctx.http).await.unwrap();
 
             sleep(Duration::from_secs(60)).await;
         }

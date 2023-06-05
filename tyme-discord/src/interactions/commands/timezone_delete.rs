@@ -11,11 +11,11 @@ use crate::data::database::Database;
 pub async fn run(ctx: Context, command: CommandInteraction) -> Result<()> {
     let data = ctx.data.read().await;
 
-    let pool = data
+    let db = data
         .get::<Database>()
         .context("Expected `Database` in TypeMap")?;
 
-    let res = match Timezone::delete(pool, command.user.id).await {
+    let res = match Timezone::delete(db, command.user.id).await {
         // TODO: fetch the deleted timezone and show what was deleted
         Ok(_) => format!("deleted"),
         Err(_) => "No timezone is set".to_string(),

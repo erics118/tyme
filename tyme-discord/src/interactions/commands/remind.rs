@@ -45,12 +45,12 @@ pub async fn run(ctx: Context, command: CommandInteraction) -> Result<()> {
 
     let data = ctx.data.read().await;
 
-    let pool = data
+    let db = data
         .get::<Database>()
         .context("Expected `Database` in TypeMap")?;
 
     // get user's timezone
-    let timezone: Tz = Timezone::get(pool, command.user.id)
+    let timezone: Tz = Timezone::get(db, command.user.id)
         .await
         .map_or_else(|_| Tz::UTC, |t| t.timezone);
 
@@ -94,7 +94,7 @@ pub async fn run(ctx: Context, command: CommandInteraction) -> Result<()> {
         guild_id: command.guild_id,
     };
 
-    r.create(pool).await?;
+    r.create(db).await?;
 
     let msg = format!(
         "Reminder set for {} on **{}**",

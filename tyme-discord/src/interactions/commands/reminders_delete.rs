@@ -36,11 +36,11 @@ pub async fn run(ctx: Context, command: CommandInteraction) -> Result<()> {
 
     let data = ctx.data.read().await;
 
-    let pool = data
+    let db = data
         .get::<Database>()
         .context("Expected `Database` in TypeMap")?;
 
-    let res = match Reminder::delete_one_by_id(pool, id).await {
+    let res = match Reminder::delete_one_by_id(db, id).await {
         // TODO: fetch the deleted reminder and show what was deleted
         Ok(_) => format!("deleted"),
         Err(_) => format!("Reminder with id `{}` does not exist", id),

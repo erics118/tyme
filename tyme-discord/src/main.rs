@@ -45,12 +45,10 @@ async fn main() -> Result<()> {
 
     log::info!("Connecting to database");
 
-    let pool = MySqlPoolOptions::new()
+    let db = MySqlPoolOptions::new()
         .max_connections(50)
         .connect(&database_url)
         .await?;
-
-    // pool.connect_options().pipes_as_concat(false);
 
     log::info!("Database connection successful");
 
@@ -62,7 +60,7 @@ async fn main() -> Result<()> {
         GatewayIntents::GUILD_MESSAGES | GatewayIntents::MESSAGE_CONTENT,
     )
     .event_handler(Handler)
-    .type_map_insert::<Database>(pool)
+    .type_map_insert::<Database>(db)
     .await
     .context("Error creating client")?;
 

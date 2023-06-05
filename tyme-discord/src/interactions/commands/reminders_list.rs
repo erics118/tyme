@@ -12,14 +12,14 @@ use crate::{data::database::Database, utils::pretty::Pretty};
 pub async fn run(ctx: Context, command: CommandInteraction) -> Result<()> {
     let data = ctx.data.read().await;
 
-    let pool = data
+    let db = data
         .get::<Database>()
         .context("Expected `Database` in TypeMap")?;
 
-    let reminders = Reminder::get_all_by_user_id(pool, command.user.id).await?;
+    let reminders = Reminder::get_all_by_user_id(db, command.user.id).await?;
 
     // get user's timezone
-    let timezone: Tz = Timezone::get(pool, command.user.id)
+    let timezone: Tz = Timezone::get(db, command.user.id)
         .await
         .map_or_else(|_| Tz::UTC, |t| t.timezone);
 
