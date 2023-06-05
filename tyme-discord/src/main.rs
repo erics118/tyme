@@ -17,12 +17,9 @@ pub mod messages;
 pub mod setup;
 pub mod utils;
 
-use std::sync::Arc;
-
 use anyhow::{Context as _, Result};
 use dotenvy::dotenv;
 use serenity::{client::Client, model::gateway::GatewayIntents};
-use tokio::sync::Mutex;
 use tyme_db::MySqlPoolOptions;
 
 use crate::{
@@ -48,7 +45,12 @@ async fn main() -> Result<()> {
 
     log::info!("Connecting to database");
 
-    let pool = MySqlPoolOptions::new().connect(&database_url).await?;
+    let pool = MySqlPoolOptions::new()
+        .max_connections(50)
+        .connect(&database_url)
+        .await?;
+
+    // pool.connect_options().pipes_as_concat(false);
 
     log::info!("Database connection successful");
 
@@ -60,14 +62,9 @@ async fn main() -> Result<()> {
         GatewayIntents::GUILD_MESSAGES | GatewayIntents::MESSAGE_CONTENT,
     )
     .event_handler(Handler)
+    .type_map_insert::<Database>(pool)
     .await
     .context("Error creating client")?;
-
-    {
-        let mut data = client.data.write().await;
-
-        data.insert::<Database>(Arc::new(Mutex::new(pool)));
-    }
 
     client.start().await?;
 

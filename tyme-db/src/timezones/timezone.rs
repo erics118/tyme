@@ -2,7 +2,6 @@ use anyhow::{Context, Result};
 use chrono_tz::Tz;
 use serenity::model::id::UserId;
 use sqlx::MySqlPool;
-use tokio::sync::Mutex;
 
 #[derive(Debug, Clone)]
 pub struct Timezone {
@@ -11,9 +10,7 @@ pub struct Timezone {
 }
 
 impl Timezone {
-    pub async fn get(pool: &Mutex<MySqlPool>, user_id: UserId) -> Result<Self> {
-        let pool = pool.lock().await;
-
+    pub async fn get(pool: &MySqlPool, user_id: UserId) -> Result<Self> {
         let row = sqlx::query!(
             r#"
             SELECT timezone
@@ -22,7 +19,7 @@ impl Timezone {
             "#,
             i64::from(user_id),
         )
-        .fetch_optional(&*pool)
+        .fetch_optional(pool)
         .await?
         .context("does not exist")?;
 
@@ -32,9 +29,7 @@ impl Timezone {
         Ok(Self { user_id, timezone })
     }
 
-    pub async fn set(&self, pool: &Mutex<MySqlPool>) -> Result<()> {
-        let pool = pool.lock().await;
-
+    pub async fn set(&self, pool: &MySqlPool) -> Result<()> {
         // either update row or create new row
         sqlx::query!(
             r#"
@@ -45,15 +40,13 @@ impl Timezone {
             i64::from(self.user_id),
             self.timezone.name()
         )
-        .execute(&*pool)
+        .execute(pool)
         .await?;
 
         Ok(())
     }
 
-    pub async fn delete(pool: &Mutex<MySqlPool>, user_id: UserId) -> Result<()> {
-        let pool = pool.lock().await;
-
+    pub async fn delete(pool: &MySqlPool, user_id: UserId) -> Result<()> {
         sqlx::query!(
             r#"
             DELETE FROM timezones
@@ -61,7 +54,7 @@ impl Timezone {
             "#,
             i64::from(user_id),
         )
-        .execute(&*pool)
+        .execute(pool)
         .await?;
         Ok(())
     }

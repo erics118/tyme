@@ -1,7 +1,7 @@
 use std::time::Duration;
 
 use anyhow::{Context as _, Result};
-use chrono::Utc;
+
 use serenity::{
     builder::CreateMessage,
     client::Context,
@@ -12,7 +12,7 @@ use serenity::{
         mention::Mentionable,
     },
 };
-use tokio::{sync::Mutex, time::sleep};
+use tokio::time::sleep;
 use tyme_db::{MySqlPool, Reminder};
 
 use crate::{
@@ -20,13 +20,9 @@ use crate::{
     utils::timestamp::{DiscordTimestamp, TimestampFormat},
 };
 
-pub async fn notify_past_reminders(pool: &Mutex<MySqlPool>, http: impl CacheHttp) -> Result<()> {
+pub async fn notify_past_reminders(pool: &MySqlPool, http: impl CacheHttp) -> Result<()> {
     // Retrieve events from the database
     let reminders = Reminder::get_all_past_reminders(pool).await?;
-
-    let current_time = Utc::now();
-
-    log::trace!("{current_time}");
 
     for r in reminders {
         log::info!("{r:#?}");
@@ -54,22 +50,20 @@ pub async fn run(ctx: Context, ready: Ready) -> Result<()> {
         kind: ActivityType::Listening,
         url: None,
     }));
+
     log::trace!("Set status");
 
     let data = ctx.data.read().await;
 
-    let db = data
+    let pool = data
         .get::<Database>()
-        .context("Expected `Database` in TypeMap")?;
-
-    let pool = db.lock().await;
-
-    let pool2 = Mutex::new(pool.clone());
+        .context("Expected `Database` in TypeMap")?
+        .clone();
 
     tokio::spawn(async move {
         loop {
             #[allow(clippy::unwrap_used)]
-            notify_past_reminders(&pool2, &ctx.http).await.unwrap();
+            notify_past_reminders(&pool, &ctx.http).await.unwrap();
 
             sleep(Duration::from_secs(60)).await;
         }

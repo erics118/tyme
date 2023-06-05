@@ -2,7 +2,6 @@ use anyhow::Result;
 use chrono::NaiveDateTime;
 use serenity::model::id::{ChannelId, GuildId, UserId};
 use sqlx::MySqlPool;
-use tokio::sync::Mutex;
 
 #[derive(Debug, Clone)]
 pub struct Reminder {
@@ -16,9 +15,7 @@ pub struct Reminder {
 }
 
 impl Reminder {
-    pub async fn create(&self, pool: &Mutex<MySqlPool>) -> Result<u64> {
-        let pool = pool.lock().await;
-
+    pub async fn create(&self, pool: &MySqlPool) -> Result<u64> {
         let id = sqlx::query!(
             r#"
             INSERT INTO reminders (created_at, time, message, user_id, channel_id, guild_id)
@@ -31,23 +28,21 @@ impl Reminder {
             i64::from(self.channel_id),
             self.guild_id.map(i64::from),
         )
-        .execute(&*pool)
+        .execute(pool)
         .await?
         .last_insert_id();
 
         Ok(id)
     }
 
-    pub async fn get_all_past_reminders(pool: &Mutex<MySqlPool>) -> Result<Vec<Self>> {
-        let pool = pool.lock().await;
-
+    pub async fn get_all_past_reminders(pool: &MySqlPool) -> Result<Vec<Self>> {
         let rows = sqlx::query!(
             r#"
             SELECT * FROM reminders
             WHERE time <= NOW();
             "#
         )
-        .fetch_all(&*pool)
+        .fetch_all(pool)
         .await?;
 
         // TODO: breaks because NOW() is different
@@ -57,7 +52,7 @@ impl Reminder {
             WHERE time <= NOW();
             "#
         )
-        .execute(&*pool)
+        .execute(pool)
         .await?;
 
         let mut reminders = Vec::new();
@@ -77,9 +72,7 @@ impl Reminder {
         Ok(reminders)
     }
 
-    pub async fn get_one_by_id(pool: &Mutex<MySqlPool>, id: u64) -> Result<Self> {
-        let pool = pool.lock().await;
-
+    pub async fn get_one_by_id(pool: &MySqlPool, id: u64) -> Result<Self> {
         let row = sqlx::query!(
             r#"
             SELECT *
@@ -88,7 +81,7 @@ impl Reminder {
             "#,
             id,
         )
-        .fetch_one(&*pool)
+        .fetch_one(pool)
         .await?;
 
         Ok(Self {
@@ -104,9 +97,7 @@ impl Reminder {
 
     // get_one_by_user_id // gets latest
 
-    pub async fn get_all_by_user_id(pool: &Mutex<MySqlPool>, user_id: UserId) -> Result<Vec<Self>> {
-        let pool = pool.lock().await;
-
+    pub async fn get_all_by_user_id(pool: &MySqlPool, user_id: UserId) -> Result<Vec<Self>> {
         let rows = sqlx::query!(
             r#"
             SELECT *
@@ -116,7 +107,7 @@ impl Reminder {
             "#,
             i64::from(user_id),
         )
-        .fetch_all(&*pool)
+        .fetch_all(pool)
         .await?;
 
         let mut reminders: Vec<Self> = Vec::new();
@@ -136,9 +127,7 @@ impl Reminder {
         Ok(reminders)
     }
 
-    pub async fn delete_one_by_id(pool: &Mutex<MySqlPool>, id: u32) -> Result<()> {
-        let pool = pool.lock().await;
-
+    pub async fn delete_one_by_id(pool: &MySqlPool, id: u32) -> Result<()> {
         sqlx::query!(
             r#"
             DELETE FROM reminders
@@ -146,15 +135,13 @@ impl Reminder {
             "#,
             id,
         )
-        .fetch_one(&*pool)
+        .fetch_one(pool)
         .await?;
 
         Ok(())
     }
 
-    pub async fn delete_all_by_user_id(pool: &Mutex<MySqlPool>, user_id: UserId) -> Result<()> {
-        let pool = pool.lock().await;
-
+    pub async fn delete_all_by_user_id(pool: &MySqlPool, user_id: UserId) -> Result<()> {
         sqlx::query!(
             r#"
             DELETE FROM reminders
@@ -162,7 +149,7 @@ impl Reminder {
             "#,
             i64::from(user_id),
         )
-        .execute(&*pool)
+        .execute(pool)
         .await?;
 
         Ok(())
