@@ -5,7 +5,7 @@ use serenity::{
     builder::{CreateInteractionResponse, CreateInteractionResponseMessage},
     client::Context,
 };
-use tyme_db::timezones::timezone::Timezone;
+use tyme_db::Timezone;
 
 use crate::data::database::Database;
 

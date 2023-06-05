@@ -5,10 +5,9 @@ use serenity::{
     builder::{CreateEmbed, CreateInteractionResponse, CreateInteractionResponseMessage},
     client::Context,
 };
-use tyme_db::{reminders::reminder::Reminder, timezones::timezone::Timezone};
-use tyme_utils::pretty::Pretty;
+use tyme_db::{Reminder, Timezone};
 
-use crate::data::database::Database;
+use crate::{data::database::Database, utils::pretty::Pretty};
 
 pub async fn run(ctx: Context, command: CommandInteraction) -> Result<()> {
     let data = ctx.data.read().await;

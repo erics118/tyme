@@ -9,7 +9,9 @@
     clippy::unwrap_used
 )]
 
-pub mod reminders;
-pub mod timezones;
+mod reminders;
+mod timezones;
 
+pub use reminders::reminder::Reminder;
 pub use sqlx::{mysql::MySqlPoolOptions, MySqlPool};
+pub use timezones::timezone::Timezone;

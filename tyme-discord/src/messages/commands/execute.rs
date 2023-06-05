@@ -1,6 +1,7 @@
 use anyhow::Result;
 use serenity::{builder::CreateMessage, client::Context, model::channel::Message};
-use tyme_utils::execute::execute;
+
+use crate::utils::execute::execute;
 
 pub async fn run(ctx: Context, message: Message) -> Result<()> {
     let cmd = message

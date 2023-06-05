@@ -15,6 +15,7 @@ pub mod interactions;
 pub mod macros;
 pub mod messages;
 pub mod setup;
+pub mod utils;
 
 use std::sync::Arc;
 

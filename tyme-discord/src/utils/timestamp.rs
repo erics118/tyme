@@ -9,6 +9,7 @@ pub enum TimestampFormat {
     LongDateTime,
     Relative,
 }
+
 pub trait DiscordTimestamp {
     fn discord_timestamp(&self, t: TimestampFormat) -> String;
 }

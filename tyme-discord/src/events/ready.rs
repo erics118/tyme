@@ -1,13 +1,50 @@
+use std::time::Duration;
+
 use anyhow::{Context as _, Result};
+use chrono::Utc;
 use serenity::{
+    builder::CreateMessage,
     client::Context,
     gateway::ActivityData,
-    model::gateway::{ActivityType, Ready},
+    http::CacheHttp,
+    model::{
+        gateway::{ActivityType, Ready},
+        mention::Mentionable,
+    },
 };
-use tokio::sync::Mutex;
-use tyme_db::reminders::event_loop::event_reminder_loop;
+use tokio::{sync::Mutex, time::sleep};
+use tyme_db::{MySqlPool, Reminder};
 
-use crate::data::database::Database;
+use crate::{
+    data::database::Database,
+    utils::timestamp::{DiscordTimestamp, TimestampFormat},
+};
+
+pub async fn notify_past_reminders(pool: &Mutex<MySqlPool>, http: impl CacheHttp) -> Result<()> {
+    // Retrieve events from the database
+    let reminders = Reminder::get_all_past_reminders(pool).await?;
+
+    let current_time = Utc::now();
+
+    log::trace!("{current_time}");
+
+    for r in reminders {
+        log::info!("{r:#?}");
+
+        let message = format!(
+            "Reminder for {}: {}\nSet {}",
+            r.user_id.mention(),
+            r.message,
+            r.created_at.discord_timestamp(TimestampFormat::Relative),
+        );
+
+        r.channel_id
+            .send_message(&http, CreateMessage::new().content(message))
+            .await?;
+    }
+
+    Ok(())
+}
 
 pub async fn run(ctx: Context, ready: Ready) -> Result<()> {
     log::info!("Bot connected as: {}", ready.user.name);
@@ -27,10 +64,15 @@ pub async fn run(ctx: Context, ready: Ready) -> Result<()> {
 
     let pool = db.lock().await;
 
-    let pool2 = pool.clone();
+    let pool2 = Mutex::new(pool.clone());
 
     tokio::spawn(async move {
-        event_reminder_loop(Mutex::new(pool2), &ctx.http).await;
+        loop {
+            #[allow(clippy::unwrap_used)]
+            notify_past_reminders(&pool2, &ctx.http).await.unwrap();
+
+            sleep(Duration::from_secs(60)).await;
+        }
     });
 
     Ok(())

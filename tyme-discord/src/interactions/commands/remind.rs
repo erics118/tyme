@@ -10,8 +10,8 @@ use serenity::{
     client::Context,
     model::application::CommandOptionType,
 };
-use tyme_db::{reminders::reminder::Reminder, timezones::timezone::Timezone};
-use tyme_utils::human_time::{HumanTime, CheckedAddHumanTime};
+use tyme_db::{Reminder, Timezone};
+use crate::utils::human_time::{HumanTime, CheckedAddHumanTime};
 
 use crate::data::database::Database;
 

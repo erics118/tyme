@@ -5,7 +5,6 @@ edition = "2021"
 rust-version = "1.60.0"
 
 [dependencies]
-tyme-utils = { path = "../tyme-utils" }
 tyme-db = { path = "../tyme-db" }
 
 anyhow = { version = "1.0.71", features = ["backtrace"] }
@@ -29,7 +28,6 @@ features = [
     "utils",
     "rustls_backend",
     "chrono",
-    "interactions_endpoint",
 ]
 
 [dependencies.chrono-tz]

@@ -6,7 +6,7 @@ use serenity::{
     builder::{CreateInteractionResponse, CreateInteractionResponseMessage},
     client::Context,
 };
-use tyme_db::reminders::reminder::Reminder;
+use tyme_db::Reminder;
 
 use crate::data::database::Database;
 
