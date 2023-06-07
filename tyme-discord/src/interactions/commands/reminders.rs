@@ -37,7 +37,7 @@ pub fn register() -> CreateCommand {
 pub async fn run(ctx: Context, command: CommandInteraction) -> Result<()> {
     let o = command.data.options();
 
-    let subcommand = &o.get(0).context("missing option")?;
+    let subcommand = o.get(0).context("missing option")?;
 
     match subcommand.name {
         "list" => super::reminders_list::run(ctx, command).await?,
