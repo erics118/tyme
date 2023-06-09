@@ -17,11 +17,10 @@ pub async fn run(ctx: Context, command: CommandInteraction) -> Result<()> {
             .clone()
     };
 
-    let res = match Timezone::delete(&db, command.user.id).await {
-        // TODO: fetch the deleted timezone and show what was deleted
-        Ok(_) => format!("deleted"),
-        Err(_) => "No timezone is set".to_string(),
-    };
+    let res = Timezone::delete(&db, command.user.id).await.map_or_else(
+        |_| "No timezone is set.".to_string(),
+        |t| format!("Your timezone of `{}` has been deleted.", t.timezone),
+    );
 
     command
         .create_response(

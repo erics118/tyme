@@ -46,7 +46,7 @@ impl Timezone {
             ON DUPLICATE KEY UPDATE timezone = VALUES(timezone);
             "#,
             i64::from(self.user_id),
-            self.timezone.name()
+            self.timezone.name(),
         )
         .execute(db)
         .await?;
@@ -55,7 +55,17 @@ impl Timezone {
     }
 
     /// Delete a user's timezone, given their user id.
-    pub async fn delete(db: &MySqlPool, user_id: UserId) -> Result<()> {
+    pub async fn delete(db: &MySqlPool, user_id: UserId) -> Result<Self> {
+        let row = sqlx::query!(
+            r#"
+            SELECT * FROM timezones
+            WHERE user_id = ?;
+            "#,
+            i64::from(user_id),
+        )
+        .fetch_one(db)
+        .await?;
+
         sqlx::query!(
             r#"
             DELETE FROM timezones
@@ -65,6 +75,12 @@ impl Timezone {
         )
         .execute(db)
         .await?;
-        Ok(())
+
+        let timezone = Tz::from_str_insensitive(&row.timezone)
+            .map_err(|_| anyhow::anyhow!("database corrupted, timezone invalid"))?;
+        Ok(Self {
+            user_id: row.user_id.into(),
+            timezone,
+        })
     }
 }

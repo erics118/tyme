@@ -8,7 +8,10 @@ use serenity::{
 };
 use tyme_db::Reminder;
 
-use crate::data::database::Database;
+use crate::{
+    data::database::Database,
+    utils::timestamp::{DiscordTimestamp, TimestampFormat},
+};
 
 /// Delete a reminder.
 pub async fn run(ctx: Context, command: CommandInteraction) -> Result<()> {
@@ -22,7 +25,7 @@ pub async fn run(ctx: Context, command: CommandInteraction) -> Result<()> {
         anyhow::bail!("incorrect resolved option type")
     };
 
-    let Ok (id) = u32::from_str(id) else {
+    let Ok(id) = u32::from_str(id) else {
         command
         .create_response(
             &ctx.http,
@@ -42,11 +45,16 @@ pub async fn run(ctx: Context, command: CommandInteraction) -> Result<()> {
             .clone()
     };
 
-    let res = match Reminder::delete_one_by_id(&db, id).await {
-        // TODO: fetch the deleted reminder and show what was deleted
-        Ok(_) => format!("deleted"),
-        Err(_) => format!("Reminder with id `{}` does not exist", id),
-    };
+    let res = Reminder::delete_one_by_id(&db, id).await.map_or_else(
+        |_| format!("Reminder with id `{}` does not exist", id),
+        |r| {
+            format!(
+                "Deleted reminder of {}\nSet {}",
+                r.message,
+                r.created_at.discord_timestamp(TimestampFormat::Relative),
+            )
+        },
+    );
 
     command
         .create_response(

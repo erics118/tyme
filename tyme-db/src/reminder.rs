@@ -55,21 +55,24 @@ impl Reminder {
 
     /// Get all past reminders, delete them, and return them.
     pub async fn get_all_past_reminders(db: &MySqlPool) -> Result<Vec<Self>> {
+        let now = chrono::Utc::now().naive_utc();
+
         let rows = sqlx::query!(
             r#"
             SELECT * FROM reminders
-            WHERE time <= NOW();
-            "#
+            WHERE time <= ?;
+            "#,
+            now,
         )
         .fetch_all(db)
         .await?;
 
-        // TODO: breaks because NOW() is different
         sqlx::query!(
             r#"
             DELETE FROM reminders
-            WHERE time <= NOW();
-            "#
+            WHERE time <= ?;
+            "#,
+            now,
         )
         .execute(db)
         .await?;
@@ -147,32 +150,68 @@ impl Reminder {
     }
 
     /// Delete a single reminder given its id.
-    pub async fn delete_one_by_id(db: &MySqlPool, id: u32) -> Result<()> {
-        sqlx::query!(
+    pub async fn delete_one_by_id(db: &MySqlPool, id: u32) -> Result<Self> {
+        let row = sqlx::query!(
             r#"
-            DELETE FROM reminders
-            WHERE id = ?;
-            "#,
+            SELECT *
+            FROM reminders
+            WHERE id = ?"#,
             id,
         )
         .fetch_one(db)
         .await?;
 
-        Ok(())
-    }
-
-    /// Delete all reminders for a user, given their user id.
-    pub async fn delete_all_by_user_id(db: &MySqlPool, user_id: UserId) -> Result<()> {
         sqlx::query!(
             r#"
             DELETE FROM reminders
-            WHERE user_id = ?;
-            "#,
-            i64::from(user_id),
+            WHERE id = ?"#,
+            id,
         )
         .execute(db)
         .await?;
 
-        Ok(())
+        Ok(Self {
+            id: Some(row.id),
+            created_at: row.created_at,
+            time: row.time,
+            message: row.message,
+            user_id: UserId::from(row.user_id),
+            channel_id: ChannelId::from(row.channel_id),
+            guild_id: row.guild_id.map(GuildId::from),
+        })
+    }
+
+    /// Delete all reminders for a user, given their user id.
+    pub async fn delete_all_by_user_id(db: &MySqlPool, user_id: UserId) -> Result<Self> {
+        let user_id = i64::from(user_id);
+
+        let row = sqlx::query!(
+            r#"
+            SELECT *
+            FROM reminders
+            WHERE user_id = ?"#,
+            user_id,
+        )
+        .fetch_one(db)
+        .await?;
+
+        sqlx::query!(
+            r#"
+            DELETE FROM reminders
+            WHERE user_id = ?"#,
+            user_id,
+        )
+        .execute(db)
+        .await?;
+
+        Ok(Self {
+            id: Some(row.id),
+            created_at: row.created_at,
+            time: row.time,
+            message: row.message,
+            user_id: UserId::from(row.user_id),
+            channel_id: ChannelId::from(row.channel_id),
+            guild_id: row.guild_id.map(GuildId::from),
+        })
     }
 }
