@@ -5,15 +5,7 @@ use chrono_tz::Tz;
 use serenity::model::id::UserId;
 use sqlx::MySqlPool;
 
-/// Timezone struct.
-#[derive(Debug, Clone, Copy)]
-pub struct Timezone {
-    /// The user's id.
-    pub user_id: UserId,
 
-    /// The user's timezone.
-    pub timezone: Tz,
-}
 
 impl Timezone {
     /// Get a user's timezone, given their user id.

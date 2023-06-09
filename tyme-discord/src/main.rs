@@ -56,7 +56,7 @@ pub mod utils;
 use anyhow::{Context as _, Result};
 use dotenvy::dotenv;
 use serenity::{client::Client, model::gateway::GatewayIntents};
-use tyme_db::MySqlPoolOptions;
+use tyme_db::MysqlConnection;
 
 use crate::{
     data::database::Database,
@@ -81,10 +81,7 @@ async fn main() -> Result<()> {
 
     log::info!("Connecting to database");
 
-    let db = MySqlPoolOptions::new()
-        .max_connections(50)
-        .connect(&database_url)
-        .await?;
+    MysqlConnection::establish(&database_url).context("Unable to connect to database")?;
 
     log::info!("Database connection successful");
 

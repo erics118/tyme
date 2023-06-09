@@ -12,6 +12,7 @@ use crate::data::database::Database;
 
 /// Delete a reminder.
 pub async fn run(ctx: Context, command: CommandInteraction) -> Result<()> {
+    todo!()
     let o = command.data.options();
 
     let subcommand = o.get(0).context("missing option")?;

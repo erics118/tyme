@@ -2,34 +2,11 @@
 
 use anyhow::Result;
 use chrono::NaiveDateTime;
+use diesel::MysqlConnection;
 use serenity::model::id::{ChannelId, GuildId, UserId};
 use sqlx::MySqlPool;
 
-/// Reminder struct.
-#[derive(Debug, Clone)]
-pub struct Reminder {
-    /// The reminder's id.
-    pub id: Option<u64>,
 
-    /// The reminder's creation time.
-    pub created_at: NaiveDateTime,
-
-    /// The time to notify the user.
-    pub time: NaiveDateTime,
-
-    /// The reminder's message.
-    pub message: String,
-
-    /// The user's id.
-    pub user_id: UserId,
-
-    /// The channel's id.
-    pub channel_id: ChannelId,
-
-    /// The guild's id.
-    /// If `None`, the reminder is a DM reminder.
-    pub guild_id: Option<GuildId>,
-}
 
 impl Reminder {
     /// Insert a new reminder into the database.
