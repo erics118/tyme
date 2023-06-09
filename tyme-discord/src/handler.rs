@@ -8,7 +8,7 @@ use serenity::{
 
 use crate::events;
 
-/// Struct that handles all events
+/// Struct that handles all events.
 #[derive(Debug, Copy, Clone)]
 pub struct Handler;
 

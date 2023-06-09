@@ -32,7 +32,7 @@ pub struct Reminder {
 }
 
 impl Reminder {
-    /// Insert a new reminder into the database
+    /// Insert a new reminder into the database.
     pub async fn create(&self, db: &MySqlPool) -> Result<u64> {
         let id = sqlx::query!(
             r#"

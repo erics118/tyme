@@ -2,48 +2,48 @@
 
 use chrono::NaiveDateTime;
 
-/// Enum of all valid Discord timestamp formats
+/// Enum of all valid Discord timestamp formats.
 
 #[derive(Debug, Copy, Clone)]
 pub enum TimestampFormat {
-    /// Short time
+    /// Short time.
     ///
     /// e.g 9:41 PM
     ShortTime,
 
-    /// Long Time
+    /// Long time.
     ///
     /// e.g. 9:41:30 PM
     LongTime,
 
-    /// Short Date
+    /// Short date.
     ///
     /// e.g. 30/06/2021
     ShortDate,
 
-    /// Long Date
+    /// Long date
     ///
-    /// e.g. 30 June 2021
+    /// e.g. 30 June 2021.
     LongDate,
 
-    /// Short Date/Time
+    /// Short date and time.
     ///
     /// e.g. 30 June 2021 9:41 PM
     ShortDateTime,
 
-    /// Long Date/Time
+    /// Long date and time.
     ///
     /// e.g. Wednesday, June, 30, 2021 9:41 PM
     LongDateTime,
 
-    /// Relative Time
+    /// Relative time.
     /// e.g. 7 months ago
     Relative,
 }
 
-/// Trait for to convert into a formatted Discord timestamp string
+/// Trait for to convert into a formatted Discord timestamp string.
 pub trait DiscordTimestamp {
-    /// Get a formatted Discord timestamp string for a given time
+    /// Get a formatted Discord timestamp string for a given time.
     fn discord_timestamp(&self, t: TimestampFormat) -> String;
 }
 
