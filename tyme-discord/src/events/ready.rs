@@ -1,7 +1,5 @@
 //! Ready event handler.
 
-use std::time::Duration;
-
 use anyhow::{Context as _, Result};
 use serenity::{
     builder::CreateMessage,
@@ -13,7 +11,7 @@ use serenity::{
         mention::Mentionable,
     },
 };
-use tokio::time::sleep;
+use tokio::time::{interval, Duration};
 use tyme_db::{MySqlPool, Reminder};
 
 use crate::{
@@ -23,7 +21,6 @@ use crate::{
 
 /// Notify users of past reminders.
 pub async fn notify_past_reminders(db: &MySqlPool, http: impl CacheHttp) -> Result<()> {
-    // Retrieve events from the database
     let reminders = Reminder::get_all_past_reminders(db).await?;
 
     for r in reminders {
@@ -64,12 +61,14 @@ pub async fn run(ctx: Context, ready: Ready) -> Result<()> {
     };
 
     tokio::spawn(async move {
+        let mut interval = interval(Duration::from_secs(60));
+
         loop {
+            interval.tick().await;
+
             notify_past_reminders(&db, &ctx.http)
                 .await
                 .unwrap_or_else(|e| log::error!("Failed to notify past reminders: {e:#?}"));
-
-            sleep(Duration::from_secs(60)).await;
         }
     });
 
