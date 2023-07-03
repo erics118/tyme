@@ -22,4 +22,4 @@ git = "https://github.com/serenity-rs/serenity"
 
 [dependencies.chrono-tz]
 features = ["std", "case-insensitive"]
-version = "0.8.2"
+version = "0.8.3"
