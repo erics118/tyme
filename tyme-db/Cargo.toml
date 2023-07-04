@@ -31,4 +31,4 @@ version = "0.6.3"
 
 [dependencies.chrono-tz]
 features = ["std", "case-insensitive"]
-version = "0.8.2"
+version = "0.8.3"
