@@ -27,7 +27,7 @@ git = "https://github.com/serenity-rs/serenity"
 
 [dependencies.sqlx]
 features = ["runtime-tokio-rustls", "mysql", "macros", "migrate", "chrono"]
-version = "0.7.0"
+version = "0.7.1"
 
 [dependencies.chrono-tz]
 features = ["std", "case-insensitive"]
