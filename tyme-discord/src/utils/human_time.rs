@@ -196,49 +196,33 @@ impl Display for HumanTime {
     fn fmt(&self, fmt: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let mut res = String::new();
         if self.years > 0 {
-            res += &format!(
-                "{}yr{} ",
-                self.years.to_string(),
-                if self.years > 1 { "s" } else { "" }
-            );
+            res += &format!("{}yr{} ", self.years, if self.years > 1 { "s" } else { "" });
         }
 
         if self.months > 0 {
             res += &format!(
                 "{}mo{} ",
-                self.months.to_string(),
+                self.months,
                 if self.months > 1 { "s" } else { "" }
             );
         }
 
         if self.weeks > 0 {
-            res += &format!(
-                "{}wk{} ",
-                self.weeks.to_string(),
-                if self.weeks > 1 { "s" } else { "" }
-            );
+            res += &format!("{}wk{} ", self.weeks, if self.weeks > 1 { "s" } else { "" });
         }
 
         if self.days > 0 {
-            res += &format!(
-                "{}day{} ",
-                self.days.to_string(),
-                if self.days > 1 { "s" } else { "" }
-            );
+            res += &format!("{}day{} ", self.days, if self.days > 1 { "s" } else { "" });
         }
 
         if self.hours > 0 {
-            res += &format!(
-                "{}hr{} ",
-                self.hours.to_string(),
-                if self.hours > 1 { "s" } else { "" }
-            );
+            res += &format!("{}hr{} ", self.hours, if self.hours > 1 { "s" } else { "" });
         }
 
         if self.minutes > 0 {
             res += &format!(
                 "{}min{} ",
-                self.minutes.to_string(),
+                self.minutes,
                 if self.minutes > 1 { "s" } else { "" }
             );
         }
@@ -246,7 +230,7 @@ impl Display for HumanTime {
         if self.seconds > 0 {
             res += &format!(
                 "{}sec{} ",
-                self.seconds.to_string(),
+                self.seconds,
                 if self.seconds > 1 { "s" } else { "" }
             );
         }

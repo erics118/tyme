@@ -48,6 +48,7 @@ pub async fn run(ctx: Context, ready: Ready) -> Result<()> {
     ctx.set_activity(Some(ActivityData {
         name: "eirk".to_string(),
         kind: ActivityType::Listening,
+        state: None,
         url: None,
     }));
 

@@ -5,7 +5,7 @@ edition = "2021"
 rust-version = "1.60.0"
 
 [dependencies]
-anyhow = { version = "1.0.71", features = ["backtrace"] }
+anyhow = { version = "1.0.72", features = ["backtrace"] }
 chrono = "0.4.26"
 
 [dependencies.serenity]
@@ -27,7 +27,7 @@ git = "https://github.com/serenity-rs/serenity"
 
 [dependencies.sqlx]
 features = ["runtime-tokio-rustls", "mysql", "macros", "migrate", "chrono"]
-version = "0.7.0"
+version = "0.7.1"
 
 [dependencies.chrono-tz]
 features = ["std", "case-insensitive"]
