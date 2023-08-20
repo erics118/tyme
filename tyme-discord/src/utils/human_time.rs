@@ -192,56 +192,36 @@ impl CheckedAddHumanTime for NaiveDateTime {
     }
 }
 
+fn pluralized(n: u32, s: &str) -> String {
+    format!("{n}{s}{}", if n > 1 { "s" } else { "" })
+}
+
 impl Display for HumanTime {
     fn fmt(&self, fmt: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let mut res = String::new();
-        if self.years > 0 {
-            res += &format!("{}yr{} ", self.years, if self.years > 1 { "s" } else { "" });
-        }
+        let units = [
+            (self.years, "yr"),
+            (self.months, "mo"),
+            (self.weeks, "wk"),
+            (self.days, "day"),
+            (self.hours, "hr"),
+            (self.minutes, "min"),
+            (self.seconds, "sec"),
+        ];
 
-        if self.months > 0 {
-            res += &format!(
-                "{}mo{} ",
-                self.months,
-                if self.months > 1 { "s" } else { "" }
-            );
-        }
+        // Filter out zero values, and pluralize the unit if necessary.
+        let res = units
+            .iter()
+            .filter_map(|(value, unit)| {
+                if *value > 0 {
+                    Some(pluralized(*value, unit))
+                } else {
+                    None
+                }
+            })
+            .collect::<Vec<_>>()
+            .join(" ");
 
-        if self.weeks > 0 {
-            res += &format!("{}wk{} ", self.weeks, if self.weeks > 1 { "s" } else { "" });
-        }
-
-        if self.days > 0 {
-            res += &format!("{}day{} ", self.days, if self.days > 1 { "s" } else { "" });
-        }
-
-        if self.hours > 0 {
-            res += &format!("{}hr{} ", self.hours, if self.hours > 1 { "s" } else { "" });
-        }
-
-        if self.minutes > 0 {
-            res += &format!(
-                "{}min{} ",
-                self.minutes,
-                if self.minutes > 1 { "s" } else { "" }
-            );
-        }
-
-        if self.seconds > 0 {
-            res += &format!(
-                "{}sec{} ",
-                self.seconds,
-                if self.seconds > 1 { "s" } else { "" }
-            );
-        }
-
-        if res.ends_with(' ') {
-            res.pop();
-        }
-
-        fmt.write_str(&res)?;
-
-        Ok(())
+        fmt.write_str(&res)
     }
 }
 
