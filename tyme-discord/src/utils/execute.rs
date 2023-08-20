@@ -11,5 +11,6 @@ pub fn execute(cmd: String) -> Result<Output> {
         .arg(cmd)
         .output()
         .context("Failed to execute process")?;
+
     Ok(output)
 }

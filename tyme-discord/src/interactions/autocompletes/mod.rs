@@ -2,4 +2,6 @@
 
 use crate::interaction_autocompletes;
 
-interaction_autocompletes!(timezone);
+interaction_autocompletes! {
+    timezone
+}
