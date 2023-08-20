@@ -111,3 +111,128 @@ macro_rules! interaction_autocompletes {
         }
     );
 }
+
+/// Create an option
+#[macro_export]
+macro_rules! create_option {
+    (
+        $option_type:ident $option_name:ident $option_description:literal $($option_required:literal)?
+        $(>> $sub_option_type:ident $sub_option_name:ident $sub_option_description:literal $($sub_option_required:literal)?)*
+    ) => {
+        paste::paste! {
+            CreateCommandOption::new(
+                CommandOptionType::$option_type,
+                stringify!($option_name),
+                $option_description,
+            )
+            $(.required($option_required))?
+            $(
+                .add_sub_option(
+                    CreateCommandOption::new(
+                        CommandOptionType::$sub_option_type,
+                        stringify!($sub_option_name),
+                        $sub_option_description,
+                    )
+                    $(.required($sub_option_required),)?
+                )
+            )*
+
+        }
+    };
+}
+
+/// Create interaction command macro
+#[macro_export]
+macro_rules! create_interaction_command {
+    (
+        $name:ident
+        | $description:literal
+        $(
+            > $option_type:ident $option_name:ident $option_description:literal $option_required:literal
+            $(>> $sub_option_type:ident $sub_option_name:ident $sub_option_description:literal $sub_option_required:literal)*
+        )*
+    ) => {
+        paste::paste! {
+            #[allow(unused)]
+            use serenity::{
+                builder::{CreateCommand, CreateCommandOption},
+                model::application::CommandOptionType,
+            };
+
+            #[doc = concat!("create the ", stringify!($name), " interaction command.")]
+            #[allow(unused)]
+            pub fn register() -> CreateCommand {
+                let mut c = CreateCommand::new(stringify!($name));
+
+                c = c.description($description);
+
+                $(
+                    c = c.add_option($crate::create_option!(
+                        $option_type $option_name $option_description $option_required
+                        $(>> $sub_option_type $sub_option_name $sub_option_description $sub_option_required)*
+                    ));
+                )*
+
+                return c;
+            }
+        }
+    };
+}
+
+/// Create interaction with only subcommands
+#[macro_export]
+macro_rules! create_interaction_command_only_subcommands {
+    (
+        $name:tt
+        $(
+            + $option_name:ident $option_description:literal
+            $(>> $sub_option_type:ident $sub_option_name:ident $sub_option_description:literal $sub_option_required:literal)*
+        )+
+    ) => {
+        paste::paste! {
+            #[allow(unused)]
+            use anyhow::{Context as _, Result};
+            #[allow(unused)]
+            use serenity::{
+                all::CommandInteraction,
+                builder::{CreateCommand, CreateCommandOption},
+                client::Context,
+                model::application::CommandOptionType,
+            };
+
+            #[doc = concat!("create the ", stringify!($name), " interaction command.")]
+            #[allow(unused)]
+            pub fn register() -> CreateCommand {
+                let mut c = CreateCommand::new(stringify!($name))
+                    .description("*");
+
+                $(
+                    c = c.add_option($crate::create_option!(
+                        SubCommand $option_name $option_description
+                        $(>> $sub_option_type $sub_option_name $sub_option_description $sub_option_required)*
+                    ));
+                )+
+
+                return c;
+            }
+
+            /// Handle the timezone command.
+            pub async fn run(ctx: Context, command: CommandInteraction) -> Result<()> {
+                let o = command.data.options();
+
+                let subcommand = &o.get(0).context("missing option")?;
+
+                match subcommand.name {
+                    $(
+                        stringify!($option_name) => super::[<$name _ $option_name>]::run(ctx, command).await?,
+                    )+
+                    _ => unreachable!(),
+                };
+
+                Ok(())
+            }
+
+
+        }
+    };
+}

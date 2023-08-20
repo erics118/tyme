@@ -3,36 +3,22 @@ use chrono::Utc;
 use chrono_tz::Tz;
 use serenity::{
     all::{CommandInteraction, ResolvedValue},
-    builder::{
-        CreateCommand, CreateCommandOption, CreateInteractionResponse,
-        CreateInteractionResponseMessage,
-    },
+    builder::{CreateInteractionResponse, CreateInteractionResponseMessage},
     client::Context,
-    model::application::CommandOptionType,
 };
 use tyme_db::{Reminder, Timezone};
 
 use crate::{
+    create_interaction_command,
     data::database::Database,
     utils::human_time::{CheckedAddHumanTime, HumanTime},
 };
 
-/// Create the remind command.
-pub fn register() -> CreateCommand {
-    CreateCommand::new("remind")
-        .description("Remind you about something")
-        .add_option(
-            CreateCommandOption::new(CommandOptionType::String, "when", "When to remind you")
-                .required(true),
-        )
-        .add_option(
-            CreateCommandOption::new(
-                CommandOptionType::String,
-                "message",
-                "What to remind you about",
-            )
-            .required(true),
-        )
+create_interaction_command! {
+    remind
+    | "Remind you about something"
+    > String when "When to remind you" true
+    > String message "What to remind you about" true
 }
 
 /// Handle the remind command.

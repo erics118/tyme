@@ -1,13 +1,15 @@
 use anyhow::Result;
 use serenity::{
     all::CommandInteraction,
-    builder::{CreateCommand, CreateInteractionResponse, CreateInteractionResponseMessage},
+    builder::{CreateInteractionResponse, CreateInteractionResponseMessage},
     client::Context,
 };
 
-/// Create the test command.
-pub fn register() -> CreateCommand {
-    CreateCommand::new("test").description("A test command")
+use crate::create_interaction_command;
+
+create_interaction_command! {
+    test
+    | "A test command"
 }
 
 /// Handle the test command.
