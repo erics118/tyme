@@ -172,7 +172,7 @@ macro_rules! create_option {
 
 /// Create interaction command macro
 #[macro_export]
-macro_rules! create_interaction_command {
+macro_rules! create_interaction_command_no_subcommands {
     (
         $name:ident
         | $description:literal
@@ -272,4 +272,15 @@ macro_rules! create_interaction_command_only_subcommands {
 
         }
     };
+}
+
+/// Create interaction command macro
+#[macro_export]
+macro_rules! create_command {
+    ( / $name:ident | $($other:tt)+ ) => {
+        $crate::create_interaction_command_no_subcommands!($name | $($other)+);
+    };
+    ( / $name:ident + $($other:tt)+ ) => {
+        $crate::create_interaction_command_only_subcommands!($name + $($other)+);
+    }
 }

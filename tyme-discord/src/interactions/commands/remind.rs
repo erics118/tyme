@@ -9,13 +9,13 @@ use serenity::{
 use tyme_db::{Reminder, Timezone};
 
 use crate::{
-    create_interaction_command,
+    create_command,
     data::database::Database,
     utils::human_time::{CheckedAddHumanTime, HumanTime},
 };
 
-create_interaction_command! {
-    remind
+create_command! {
+    / remind
     | "Remind you about something"
     > String when "When to remind you" required
     > String message "What to remind you about" required

@@ -1,7 +1,7 @@
-use crate::create_interaction_command_only_subcommands;
+use crate::create_command;
 
-create_interaction_command_only_subcommands! {
-    timezone
+create_command! {
+    / timezone
     + set "Set your default timezone"
     >> String timezone "Timezone to set" required autocomplete
     + get "Get your default timezone"

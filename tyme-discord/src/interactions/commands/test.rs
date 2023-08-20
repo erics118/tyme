@@ -5,10 +5,10 @@ use serenity::{
     client::Context,
 };
 
-use crate::create_interaction_command;
+use crate::create_command;
 
-create_interaction_command! {
-    test
+create_command! {
+    / test
     | "A test command"
 }
 

@@ -1,7 +1,7 @@
-use crate::create_interaction_command_only_subcommands;
+use crate::create_command;
 
-create_interaction_command_only_subcommands! {
-    reminders
+create_command! {
+    / reminders
     + list "List your upcoming reminders"
     + delete "Delete an upcoming reminder"
     >> String reminder_id "Reminder to delete" required autocomplete
