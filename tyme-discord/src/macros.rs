@@ -4,12 +4,12 @@
 /// execute each message command.
 #[macro_export]
 macro_rules! message_commands {
-    ($($cmd:ident),+ $(,)?) => (
+    ($($cmd:ident),+ $(,)?) => { paste::paste! {
         use anyhow::Result;
         use serenity::{client::Context, model::prelude::Message};
 
         $(
-            #[doc = concat!(stringify!($cmd), " message command.")]
+            #[doc = $cmd " message command."]
             pub mod $cmd;
         )+
 
@@ -23,7 +23,7 @@ macro_rules! message_commands {
 
             Ok(())
         }
-    );
+    } };
 }
 
 /// Macro that declares modules for interaction commands and a function to
@@ -41,7 +41,7 @@ macro_rules! interaction_commands {
         };
 
         $(
-            #[doc = concat!(stringify!($command), " interaction command.")]
+            #[doc = $command " interaction command."]
             pub mod $command;
 
             $(
@@ -87,7 +87,7 @@ macro_rules! interaction_commands {
 /// execute interaction autocompletes.
 #[macro_export]
 macro_rules! interaction_autocompletes {
-    ($($cmd:ident),+ $(,)?) => (
+    ($($cmd:ident),+ $(,)?) => { paste::paste! {
         use anyhow::Result;
         use serenity::{
             client::Context,
@@ -95,7 +95,7 @@ macro_rules! interaction_autocompletes {
         };
 
         $(
-            #[doc = concat!(stringify!($cmd), " interaction autocomplete.")]
+            #[doc = $cmd " interaction autocomplete."]
             pub mod $cmd;
         )+
 
@@ -109,10 +109,15 @@ macro_rules! interaction_autocompletes {
 
             Ok(())
         }
-    );
+    } };
 }
 
 /// Create an extra basic option
+///
+/// Format:
+/// ```
+/// create_extra_basic_option!(String name "Description")
+/// ```
 #[macro_export]
 macro_rules! create_extra_basic_option {
     (
@@ -127,25 +132,34 @@ macro_rules! create_extra_basic_option {
 }
 
 /// Create a basic option
+///
+/// Format:
+/// ```
+/// create_basic_option!(String name "Description" [optional/required] [autocomplete])
+/// ```
 #[macro_export]
 macro_rules! create_basic_option {
     ($option_type:tt $option_name:ident $option_description:literal) => {
         $crate::create_extra_basic_option!($option_type $option_name $option_description)
     };
-    ($option_type:tt $option_name:ident $option_description:literal optional) => {
+    ($option_type:ident $option_name:ident $option_description:literal optional) => {
         $crate::create_extra_basic_option!($option_type $option_name $option_description)
             .required(false)
     };
-    ($option_type:tt $option_name:ident $option_description:literal required) => {
+    ($option_type:ident $option_name:ident $option_description:literal required) => {
         $crate::create_extra_basic_option!($option_type $option_name $option_description)
             .required(true)
     };
-    ($option_type:tt $option_name:ident $option_description:literal optional autocomplete) => {
+    ($option_type:ident $option_name:ident $option_description:literal autocomplete) => {
+        $crate::create_extra_basic_option!($option_type $option_name $option_description)
+            .set_autocomplete(true)
+    };
+    ($option_type:ident $option_name:ident $option_description:literal optional autocomplete) => {
         $crate::create_extra_basic_option!($option_type $option_name $option_description)
             .required(false)
             .set_autocomplete(true)
     };
-    ($option_type:tt $option_name:ident $option_description:literal required autocomplete) => {
+    ($option_type:ident $option_name:ident $option_description:literal required autocomplete) => {
         $crate::create_extra_basic_option!($option_type $option_name $option_description)
             .required(true)
             .set_autocomplete(true)
@@ -153,6 +167,14 @@ macro_rules! create_basic_option {
 }
 
 /// Create an option
+///
+/// Format:
+///
+/// ```
+/// create_option!(
+///     String name "Description" [optional/required] [autocomplete])
+///     >> String another "Description" [optional/required] [autocomplete]
+/// ```
 #[macro_export]
 macro_rules! create_option {
     (
@@ -171,6 +193,18 @@ macro_rules! create_option {
 }
 
 /// Create interaction command macro
+///
+/// Format:
+///
+/// ```
+/// create_interaction_command!(
+///    name
+///   | "Description"
+///    > String option_name "Description" [optional/required] [autocomplete]
+///    >> String suboption_name "Description" [optional/required] [autocomplete]
+///    > String another_option_name "Description" [optional/required] [autocomplete]
+/// )
+/// ```
 #[macro_export]
 macro_rules! create_interaction_command_no_subcommands {
     (
@@ -182,15 +216,14 @@ macro_rules! create_interaction_command_no_subcommands {
                 >> $suboption_type:ident $suboption_name:ident $suboption_description:literal $($suboption_other:ident)*
             )*
         )*
-    ) => {
+    ) => { paste::paste! {
         #[allow(unused)]
         use serenity::{
             builder::{CreateCommand, CreateCommandOption},
             model::application::CommandOptionType,
         };
 
-        #[doc = concat!("create the ", stringify!($name), " interaction command.")]
-        #[allow(unused)]
+        #[doc = "create the " $name " interaction command."]
         pub fn register() -> CreateCommand {
             let mut c = CreateCommand::new(stringify!($name));
 
@@ -207,21 +240,31 @@ macro_rules! create_interaction_command_no_subcommands {
 
             return c;
         }
-    };
+    } };
 }
 
-/// Create interaction with only subcommands
+/// Create interaction command with only subcommands
+///
+/// Format:
+///
+/// ```
+/// create_interaction_command_only_subcommands!(
+///     name
+///     + option_name "Description"
+///     >> String suboption_name "Description"
+///     + another_option_name "Description"
+/// )
 #[macro_export]
 macro_rules! create_interaction_command_only_subcommands {
     (
-        $name:tt
+        $name:ident
         $(
             + $option_name:ident $option_description:literal
             $(
                 >> $suboption_type:ident $suboption_name:ident $suboption_description:literal $($suboption_other:ident)*
             )*
         )+
-    ) => {
+    ) => { paste::paste! {
 
         #[allow(unused)]
         use anyhow::{Context as _, Result};
@@ -233,7 +276,7 @@ macro_rules! create_interaction_command_only_subcommands {
             model::application::CommandOptionType,
         };
 
-        #[doc = concat!("create the ", stringify!($name), " interaction command.")]
+        #[doc = "create the " $name " interaction command."]
         #[allow(unused)]
         pub fn register() -> CreateCommand {
             let mut c = CreateCommand::new(stringify!($name))
@@ -251,30 +294,45 @@ macro_rules! create_interaction_command_only_subcommands {
             return c;
         }
 
-        paste::paste! {
+        /// Handle the timezone command.
+        pub async fn run(ctx: Context, command: CommandInteraction) -> Result<()> {
+            let o = command.data.options();
 
-            /// Handle the timezone command.
-            pub async fn run(ctx: Context, command: CommandInteraction) -> Result<()> {
-                let o = command.data.options();
+            let subcommand = &o.get(0).context("missing option")?;
 
-                let subcommand = &o.get(0).context("missing option")?;
+            match subcommand.name {
+                $(
+                    stringify!($option_name) => super::[< $name _ $option_name >]::run(ctx, command).await?,
+                )+
+                _ => unreachable!(),
+            };
 
-                match subcommand.name {
-                    $(
-                        stringify!($option_name) => super::[< $name _ $option_name >]::run(ctx, command).await?,
-                    )+
-                    _ => unreachable!(),
-                };
-
-                Ok(())
-            }
-
-
+            Ok(())
         }
-    };
+
+    } };
 }
 
 /// Create interaction command macro
+///
+/// Format:
+///
+/// ```
+/// create_interaction_command!(
+///     / name
+///     | "Description"
+///    > String option_name "Description" [optional/required] [autocomplete]
+///    >> String suboption_name "Description" [optional/required] [autocomplete]
+///    > String another_option_name "Description" [optional/required] [autocomplete]
+/// )
+///
+/// create_interaction_command!(
+///     / name
+///     + subcmd "Description"
+///     >> String option_name "Description" [optional/required] [autocomplete]
+///     + another_subcmd "Description"
+/// )
+/// ```
 #[macro_export]
 macro_rules! create_command {
     ( / $name:ident | $($other:tt)+ ) => {
