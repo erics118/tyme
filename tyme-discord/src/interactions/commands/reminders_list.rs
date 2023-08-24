@@ -1,13 +1,9 @@
 use anyhow::{Context as _, Result};
 use chrono_tz::Tz;
-use serenity::{
-    all::CommandInteraction,
-    builder::{CreateEmbed, CreateInteractionResponse, CreateInteractionResponseMessage},
-    client::Context,
-};
+use serenity::{all::CommandInteraction, builder::CreateEmbed, client::Context};
 use tyme_db::{Reminder, Timezone};
 
-use crate::{data::database::Database, utils::pretty::Pretty};
+use crate::{create_message, data::database::Database, utils::pretty::Pretty};
 
 /// List all reminders of a user.
 pub async fn run(ctx: Context, command: CommandInteraction) -> Result<()> {
@@ -41,12 +37,7 @@ pub async fn run(ctx: Context, command: CommandInteraction) -> Result<()> {
     );
 
     command
-        .create_response(
-            &ctx.http,
-            CreateInteractionResponse::Message(
-                CreateInteractionResponseMessage::new().embed(embed),
-            ),
-        )
+        .create_response(&ctx.http, create_message!(/, # embed))
         .await?;
 
     Ok(())

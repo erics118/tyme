@@ -1,7 +1,7 @@
 use anyhow::Result;
-use serenity::{builder::CreateMessage, client::Context, model::channel::Message};
+use serenity::{client::Context, model::channel::Message};
 
-use crate::utils::execute::execute;
+use crate::{create_message, utils::execute::execute};
 
 /// Execute a shell command and output the result.
 pub async fn run(ctx: Context, message: Message) -> Result<()> {
@@ -9,8 +9,9 @@ pub async fn run(ctx: Context, message: Message) -> Result<()> {
         .content
         .split(' ')
         .skip(2)
-        .collect::<Vec<&str>>()
+        .collect::<Vec<_>>()
         .join(" ");
+
     log::info!("Running shell command: {cmd}");
     let output = execute(cmd)?;
 
@@ -18,14 +19,15 @@ pub async fn run(ctx: Context, message: Message) -> Result<()> {
         .channel_id
         .send_message(
             &ctx.http,
-            CreateMessage::new()
-                .content(format!(
+            create_message!(
+                format!(
                     "```\nstdout:\n{}\n\n\nstderr:\n{}\n\n\n{}```",
                     String::from_utf8_lossy(&output.stdout),
                     String::from_utf8_lossy(&output.stderr),
                     output.status
-                ))
-                .reference_message(&message),
+                ),
+                @ message
+            ),
         )
         .await?;
 

@@ -1,12 +1,8 @@
 use anyhow::{Context as _, Result};
-use serenity::{
-    all::CommandInteraction,
-    builder::{CreateInteractionResponse, CreateInteractionResponseMessage},
-    client::Context,
-};
+use serenity::{all::CommandInteraction, client::Context};
 use tyme_db::Timezone;
 
-use crate::data::database::Database;
+use crate::{create_message, data::database::Database};
 
 /// Delete a user's timezone.
 pub async fn run(ctx: Context, command: CommandInteraction) -> Result<()> {
@@ -23,12 +19,7 @@ pub async fn run(ctx: Context, command: CommandInteraction) -> Result<()> {
     );
 
     command
-        .create_response(
-            &ctx.http,
-            CreateInteractionResponse::Message(
-                CreateInteractionResponseMessage::new().content(res),
-            ),
-        )
+        .create_response(&ctx.http, create_message!(/ res,))
         .await?;
 
     Ok(())

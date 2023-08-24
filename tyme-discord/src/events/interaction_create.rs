@@ -12,13 +12,14 @@ pub async fn run(ctx: Context, interaction: Interaction) -> Result<()> {
             log::trace!("Received interaction command: {}", command.data.name);
 
             commands::exec(ctx, command).await?;
-            Ok(())
         },
         Interaction::Autocomplete(autocomplete) => {
             log::trace!("Received autocomplete: {}", autocomplete.data.name);
 
-            autocompletes::exec(ctx, autocomplete).await
+            autocompletes::exec(ctx, autocomplete).await?;
         },
-        _ => Ok(()),
+        _ => (),
     }
+
+    Ok(())
 }

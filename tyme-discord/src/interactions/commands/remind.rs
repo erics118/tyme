@@ -3,13 +3,12 @@ use chrono::Utc;
 use chrono_tz::Tz;
 use serenity::{
     all::{CommandInteraction, ResolvedValue},
-    builder::{CreateInteractionResponse, CreateInteractionResponseMessage},
     client::Context,
 };
 use tyme_db::{Reminder, Timezone};
 
 use crate::{
-    create_command,
+    create_command, create_message,
     data::database::Database,
     utils::human_time::{CheckedAddHumanTime, HumanTime},
 };
@@ -52,9 +51,7 @@ pub async fn run(ctx: Context, command: CommandInteraction) -> Result<()> {
         command
             .create_response(
                 &ctx.http,
-                CreateInteractionResponse::Message(
-                    CreateInteractionResponseMessage::new().content("Invalid time."),
-                ),
+                create_message!(/ "Invalid time.",),
             )
             .await?;
 
@@ -65,9 +62,7 @@ pub async fn run(ctx: Context, command: CommandInteraction) -> Result<()> {
         command
         .create_response(
             &ctx.http,
-            CreateInteractionResponse::Message(
-                CreateInteractionResponseMessage::new().content("Invalid time."),
-            ),
+            create_message!(/ "Invalid time.",),
         )
         .await?;
 
@@ -97,12 +92,7 @@ pub async fn run(ctx: Context, command: CommandInteraction) -> Result<()> {
     );
 
     command
-        .create_response(
-            &ctx.http,
-            CreateInteractionResponse::Message(
-                CreateInteractionResponseMessage::new().content(msg),
-            ),
-        )
+        .create_response(&ctx.http, create_message!(/ msg,))
         .await?;
 
     Ok(())

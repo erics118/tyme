@@ -2,7 +2,6 @@
 
 use anyhow::{Context as _, Result};
 use serenity::{
-    builder::CreateMessage,
     client::Context,
     gateway::ActivityData,
     http::CacheHttp,
@@ -15,6 +14,7 @@ use tokio::time::{interval, Duration};
 use tyme_db::{MySqlPool, Reminder};
 
 use crate::{
+    create_message,
     data::database::Database,
     utils::timestamp::{DiscordTimestamp, TimestampFormat},
 };
@@ -34,7 +34,7 @@ pub async fn notify_past_reminders(db: &MySqlPool, http: impl CacheHttp) -> Resu
         );
 
         r.channel_id
-            .send_message(&http, CreateMessage::new().content(message))
+            .send_message(&http, create_message!(message,))
             .await?;
     }
 

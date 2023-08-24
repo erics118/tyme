@@ -342,3 +342,44 @@ macro_rules! create_command {
         $crate::create_interaction_command_only_subcommands!($name + $($other)+);
     }
 }
+
+/// Create interaction response message
+#[macro_export]
+macro_rules! create_interaction_response_message {
+    (
+        $($content:expr)? ,
+        $( $( # $embed:tt )+ )?
+    ) => {
+        serenity::builder::CreateInteractionResponse::Message(
+            serenity::builder::CreateInteractionResponseMessage::new()
+                $( .content($content) )?
+                $( $( .add_embed($embed) )+ )?
+        )
+    };
+}
+
+/// Create normal message
+#[macro_export]
+macro_rules! create_normal_message {
+    (
+        $($content:expr)? ,
+        $( $( # $embed:tt )+ )?
+        $( @ $reference_message:tt )?
+    ) => {
+        serenity::builder::CreateMessage::new()
+            $( .content($content) )?
+            $( $( .add_embed($embed) )+ )?
+            $( .reference_message(&$reference_message) )?
+    };
+}
+
+/// Create a message
+#[macro_export]
+macro_rules! create_message {
+    ( / $($other:tt)* ) => {
+        $crate::create_interaction_response_message!($($other)*)
+    };
+    ( $($other:tt)* ) => {
+        $crate::create_normal_message!($($other)*)
+    };
+}

@@ -3,12 +3,12 @@ use std::str::FromStr;
 use anyhow::{Context as _, Result};
 use serenity::{
     all::{CommandInteraction, ResolvedValue},
-    builder::{CreateInteractionResponse, CreateInteractionResponseMessage},
     client::Context,
 };
 use tyme_db::Reminder;
 
 use crate::{
+    create_message,
     data::database::Database,
     utils::timestamp::{DiscordTimestamp, TimestampFormat},
 };
@@ -29,9 +29,7 @@ pub async fn run(ctx: Context, command: CommandInteraction) -> Result<()> {
         command
         .create_response(
             &ctx.http,
-            CreateInteractionResponse::Message(
-                CreateInteractionResponseMessage::new().content("Invalid id format"),
-            ),
+            create_message!(/ "Invalid id format",),
         )
         .await?;
 
@@ -57,12 +55,7 @@ pub async fn run(ctx: Context, command: CommandInteraction) -> Result<()> {
     );
 
     command
-        .create_response(
-            &ctx.http,
-            CreateInteractionResponse::Message(
-                CreateInteractionResponseMessage::new().content(res),
-            ),
-        )
+        .create_response(&ctx.http, create_message!(/ res,))
         .await?;
 
     Ok(())

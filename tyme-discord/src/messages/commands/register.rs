@@ -1,7 +1,7 @@
 use anyhow::Result;
-use serenity::{builder::CreateMessage, client::Context, model::channel::Message};
+use serenity::{client::Context, model::channel::Message};
 
-use crate::interactions::commands::register_all;
+use crate::{create_message, interactions::commands::register_all};
 
 /// Register all application commands.
 pub async fn run(ctx: Context, message: Message) -> Result<()> {
@@ -11,9 +11,10 @@ pub async fn run(ctx: Context, message: Message) -> Result<()> {
         .channel_id
         .send_message(
             &ctx.http,
-            CreateMessage::new()
-                .content("Registered all application commands.")
-                .reference_message(&message),
+            create_message!(
+                    "Registered all application commands.",
+                    @ message
+            ),
         )
         .await?;
 

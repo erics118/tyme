@@ -2,12 +2,11 @@ use anyhow::{Context as _, Result};
 use chrono_tz::Tz;
 use serenity::{
     all::{CommandInteraction, ResolvedValue},
-    builder::{CreateInteractionResponse, CreateInteractionResponseMessage},
     client::Context,
 };
 use tyme_db::Timezone;
 
-use crate::data::database::Database;
+use crate::{create_message, data::database::Database};
 
 /// Set a user's timezone.
 pub async fn run(ctx: Context, command: CommandInteraction) -> Result<()> {
@@ -28,11 +27,9 @@ pub async fn run(ctx: Context, command: CommandInteraction) -> Result<()> {
             command
                 .create_response(
                     &ctx.http,
-                    CreateInteractionResponse::Message(CreateInteractionResponseMessage::new().content(
-                        format!(
-                            "Invalid timezone. You can find them here: <https://en.wikipedia.org/wiki/List_of_tz_database_time_zones>",
-                        ),
-                    )),
+                    create_message!(
+                        / "Invalid timezone. You can find them here: <https://en.wikipedia.org/wiki/List_of_tz_database_time_zones>",
+                    ),
                 )
                 .await?;
             return Ok(());
@@ -53,14 +50,10 @@ pub async fn run(ctx: Context, command: CommandInteraction) -> Result<()> {
 
     t.set(&db).await?;
 
+    let msg = format!("Set your timezone to `{}`", t.timezone.name());
+
     command
-        .create_response(
-            &ctx.http,
-            CreateInteractionResponse::Message(
-                CreateInteractionResponseMessage::new()
-                    .content(format!("Set your timezone to `{}`", t.timezone.name())),
-            ),
-        )
+        .create_response(&ctx.http, create_message!(/ msg,))
         .await?;
 
     Ok(())
