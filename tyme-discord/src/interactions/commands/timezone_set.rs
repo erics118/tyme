@@ -1,26 +1,17 @@
 use anyhow::{Context as _, Result};
 use chrono_tz::Tz;
 use serenity::{
-    all::{CommandInteraction, ResolvedValue},
+    all::CommandInteraction,
     builder::{CreateInteractionResponse, CreateInteractionResponseMessage},
     client::Context,
 };
 use tyme_db::Timezone;
 
-use crate::data::database::Database;
+use crate::{data::database::Database, get_options};
 
 /// Set a user's timezone.
 pub async fn run(ctx: Context, command: CommandInteraction) -> Result<()> {
-    let o = command.data.options();
-
-    let subcommand = o.get(0).context("missing option")?;
-
-    let ResolvedValue::SubCommand(ref a) = subcommand.value else { panic!("f")};
-
-    let ResolvedValue::String(timezone) = &a.get(0)
-        .context("missing option")?.value else {
-        anyhow::bail!("incorrect resolved option type")
-    };
+    let (timezone,) = get_options!(command, .String);
 
     let timezone = match Tz::from_str_insensitive(timezone) {
         Ok(t) => t,

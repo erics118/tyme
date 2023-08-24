@@ -3,6 +3,7 @@
 //! starting the bot and connecting to the database.
 
 #![forbid(unsafe_code)]
+#![feature(stmt_expr_attributes)]
 #![warn(
     absolute_paths_not_starting_with_crate,
     elided_lifetimes_in_paths,
@@ -26,7 +27,6 @@
     trivial_casts,
     trivial_numeric_casts,
     unsafe_op_in_unsafe_fn,
-    unstable_features,
     unused_crate_dependencies,
     unused_extern_crates,
     unused_import_braces,

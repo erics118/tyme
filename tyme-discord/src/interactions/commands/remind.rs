@@ -2,7 +2,7 @@ use anyhow::{Context as _, Result};
 use chrono::Utc;
 use chrono_tz::Tz;
 use serenity::{
-    all::{CommandInteraction, ResolvedValue},
+    all::CommandInteraction,
     builder::{CreateInteractionResponse, CreateInteractionResponseMessage},
     client::Context,
 };
@@ -11,6 +11,7 @@ use tyme_db::{Reminder, Timezone};
 use crate::{
     create_command,
     data::database::Database,
+    get_options,
     utils::human_time::{CheckedAddHumanTime, HumanTime},
 };
 
@@ -23,15 +24,7 @@ create_command! {
 
 /// Handle the remind command.
 pub async fn run(ctx: Context, command: CommandInteraction) -> Result<()> {
-    let o = command.data.options();
-
-    let ResolvedValue::String(when) = &o.get(0).context("missing option")?.value else {
-        anyhow::bail!("incorrect resolved option type")
-    };
-
-    let ResolvedValue::String(description) = &o.get(1).context("missing option")?.value else {
-        anyhow::bail!("incorrect resolved option type")
-    };
+    let (when, description) = get_options!(command, String, String);
 
     let db = {
         let data = ctx.data.read().await;

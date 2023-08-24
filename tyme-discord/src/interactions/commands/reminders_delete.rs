@@ -2,7 +2,7 @@ use std::str::FromStr;
 
 use anyhow::{Context as _, Result};
 use serenity::{
-    all::{CommandInteraction, ResolvedValue},
+    all::CommandInteraction,
     builder::{CreateInteractionResponse, CreateInteractionResponseMessage},
     client::Context,
 };
@@ -10,20 +10,13 @@ use tyme_db::Reminder;
 
 use crate::{
     data::database::Database,
+    get_options,
     utils::timestamp::{DiscordTimestamp, TimestampFormat},
 };
 
 /// Delete a reminder.
 pub async fn run(ctx: Context, command: CommandInteraction) -> Result<()> {
-    let o = command.data.options();
-
-    let subcommand = o.get(0).context("missing option")?;
-
-    let ResolvedValue::SubCommand(ref a) = subcommand.value else { panic!("f")};
-
-    let ResolvedValue::String(id) = &a.get(0).context("missing option")?.value else {
-        anyhow::bail!("incorrect resolved option type")
-    };
+    let (id,) = get_options!(command, .String);
 
     let Ok(id) = u32::from_str(id) else {
         command
