@@ -1,4 +1,4 @@
-FROM rust:1.70.0-slim-buster AS builder
+FROM rustlang/rust:nightly-slim AS builder
 
 ARG DATABASE_URL
 ENV DATABASE_URL=$DATABASE_URL
