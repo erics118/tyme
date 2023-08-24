@@ -368,25 +368,21 @@ macro_rules! get_option_value {
             anyhow::bail!("incorrect resolved option type")
         };
 
-        (value.clone(),kind.clone())
+        (value.clone(), kind.clone())
     } };
     ($options:ident $index:tt . [$($nested_type:ident)+] ) => { {
         let value = $crate::get_option_value!($options $index SubCommand);
 
         let mut index = 0;
 
-        (
-            $(
-                {
-                    let value = $crate::get_option_value!(value index $nested_type);
+        ( $( {
+            let value = $crate::get_option_value!(value index $nested_type);
 
-                    // value is used in the next repetition
-                    #[allow(unused_assignments)]
-                    index += 1;
-                    value.clone()
-                },
-            )+
-        )
+            // value is used in the next repetition
+            #[allow(unused_assignments)]
+            index += 1;
+            value.clone()
+        }, )+ )
     } };
 }
 
@@ -402,23 +398,17 @@ macro_rules! get_options {
             $( $option_type:ident )? $( . [$($nested_type:ident),+])?
         ),+
         $(,)?
-    ) => {
-        {
-            let options = $command.data.options();
-            let mut index = 0;
+    ) => { {
+        let options = $command.data.options();
+        let mut index = 0;
 
-            (
-                $(
-                    {
-                        let value = $crate::get_option_value!(options index $( $option_type )? $( . [$($nested_type)+])?);
+        ( $( {
+            let value = $crate::get_option_value!(options index $( $option_type )? $( . [$($nested_type)+])?);
 
-                        // value is used in the next repetition
-                        #[allow(unused_assignments)]
-                        index += 1;
-                        value.clone()
-                    },
-                )+
-            )
-        }
-    };
+            // value is used in the next repetition
+            #[allow(unused_assignments)]
+            index += 1;
+            value.clone()
+        }, )+ )
+    } };
 }
