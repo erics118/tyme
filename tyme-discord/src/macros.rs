@@ -355,28 +355,38 @@ macro_rules! create_command {
 #[macro_export]
 macro_rules! get_option_value {
     ($options:ident $index:tt $option_type:ident ) => { {
-        let serenity::all::ResolvedValue::$option_type(ref value) = &$options.get($index).context("missing option")?.value else {
+        let serenity::all::ResolvedValue::$option_type(value) = &$options.get($index).context("missing option")?.value else {
             anyhow::bail!("incorrect resolved option type")
         };
 
         value
     } };
-    ($options:ident $index:tt . Autocomplete ) => { {
-        let value = $crate::get_option_value!( $options $index SubCommand);
+    ($options:ident $index:tt . [Autocomplete] ) => { {
+        let value = $crate::get_option_value!($options $index SubCommand);
 
-        let serenity::all::ResolvedValue::Autocomplete{value, ..} = &value.get($index).context("missing option")?.value else {
+        let serenity::all::ResolvedValue::Autocomplete{value, kind} = &value.get($index).context("missing option")?.value else {
             anyhow::bail!("incorrect resolved option type")
         };
 
-        value
+        (value.clone(),kind.clone())
     } };
-    ($options:ident $index:tt . $nested_type:ident ) => { {
-        let value = $crate::get_option_value!( $options $index SubCommand);
+    ($options:ident $index:tt . [$($nested_type:ident)+] ) => { {
+        let value = $crate::get_option_value!($options $index SubCommand);
 
-        // TODO: dont hardcode to support multiple options for a subcommand
-        let value = $crate::get_option_value!( value 0 $nested_type);
+        let mut index = 0;
 
-        value
+        (
+            $(
+                {
+                    let value = $crate::get_option_value!(value index $nested_type);
+
+                    // value is used in the next repetition
+                    #[allow(unused_assignments)]
+                    index += 1;
+                    value.clone()
+                }
+            )+
+        )
     } };
 }
 
@@ -389,7 +399,7 @@ macro_rules! get_options {
         $(
             // Only one of these two can be matched, because get_option_value
             // will fail if both exist.
-            $( $option_type:ident )? $( . $nested_type:ident)?
+            $( $option_type:ident )? $( . [$($nested_type:ident)+])?
         ),+
         $(,)?
     ) => {
@@ -400,7 +410,7 @@ macro_rules! get_options {
             (
                 $(
                     {
-                        let value = $crate::get_option_value!(options index $( $option_type )? $( . $nested_type)?);
+                        let value = $crate::get_option_value!(options index $( $option_type )? $( . [$($nested_type)+])?);
 
                         // value is used in the next repetition
                         #[allow(unused_assignments)]
@@ -410,5 +420,5 @@ macro_rules! get_options {
                 )+
             )
         }
-};
+    };
 }

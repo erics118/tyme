@@ -16,7 +16,7 @@ use crate::{
 
 /// Delete a reminder.
 pub async fn run(ctx: Context, command: CommandInteraction) -> Result<()> {
-    let (id,) = get_options!(command, .String);
+    let (id,) = get_options!(command, .[String]);
 
     let Ok(id) = u32::from_str(id) else {
         command

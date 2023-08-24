@@ -11,7 +11,7 @@ use crate::{get_options, utils::fuzzy_autocomplete::fuzzy_autocomplete};
 
 /// Autocomplete with valid timezones.
 pub async fn run(ctx: Context, command: CommandInteraction) -> Result<()> {
-    let (cur,) = get_options!(command, .Autocomplete);
+    let ((cur, _kind),) = get_options!(command, .[Autocomplete]);
 
     let values = TZ_VARIANTS.iter().map(|v| v.name()).collect::<Vec<_>>();
 
