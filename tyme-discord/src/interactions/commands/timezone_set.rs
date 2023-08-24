@@ -11,7 +11,7 @@ use crate::{data::database::Database, get_options};
 
 /// Set a user's timezone.
 pub async fn run(ctx: Context, command: CommandInteraction) -> Result<()> {
-    let (timezone,) = get_options!(command, .[String]);
+    let ((timezone,),) = get_options!(command, .[String]);
 
     let timezone = match Tz::from_str_insensitive(timezone) {
         Ok(t) => t,

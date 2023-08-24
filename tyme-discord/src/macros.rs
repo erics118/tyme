@@ -384,7 +384,7 @@ macro_rules! get_option_value {
                     #[allow(unused_assignments)]
                     index += 1;
                     value.clone()
-                }
+                },
             )+
         )
     } };
@@ -399,7 +399,7 @@ macro_rules! get_options {
         $(
             // Only one of these two can be matched, because get_option_value
             // will fail if both exist.
-            $( $option_type:ident )? $( . [$($nested_type:ident)+])?
+            $( $option_type:ident )? $( . [$($nested_type:ident),+])?
         ),+
         $(,)?
     ) => {
