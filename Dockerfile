@@ -3,8 +3,6 @@ FROM rustlang/rust:nightly-bookworm-slim AS builder
 ARG DATABASE_URL
 ENV DATABASE_URL=$DATABASE_URL
 
-RUN ldd --version
-
 WORKDIR /app
 
 COPY . .
