@@ -6,7 +6,7 @@ rust-version = "1.60.0"
 
 [dependencies]
 anyhow = { version = "1.0.75", features = ["backtrace"] }
-chrono = "0.4.28"
+chrono = "0.4.30"
 
 [dependencies.serenity]
 branch = "next"
