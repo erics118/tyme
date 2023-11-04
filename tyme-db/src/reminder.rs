@@ -2,7 +2,6 @@
 
 use anyhow::Result;
 use chrono::NaiveDateTime;
-use serenity::model::id::{ChannelId, GuildId, UserId};
 use sqlx::MySqlPool;
 
 /// Reminder struct.
@@ -21,14 +20,14 @@ pub struct Reminder {
     pub message: String,
 
     /// The user's id.
-    pub user_id: UserId,
+    pub user_id: u64,
 
     /// The channel's id.
-    pub channel_id: ChannelId,
+    pub channel_id: u64,
 
     /// The guild's id.
     /// If `None`, the reminder is a DM reminder.
-    pub guild_id: Option<GuildId>,
+    pub guild_id: Option<u64>,
 }
 
 impl Reminder {
@@ -42,9 +41,9 @@ impl Reminder {
             self.created_at,
             self.time,
             self.message,
-            i64::from(self.user_id),
-            i64::from(self.channel_id),
-            self.guild_id.map(i64::from),
+            self.user_id,
+            self.channel_id,
+            self.guild_id,
         )
         .execute(db)
         .await?
@@ -85,9 +84,9 @@ impl Reminder {
                 created_at: row.created_at,
                 time: row.time,
                 message: row.message,
-                user_id: UserId::from(row.user_id),
-                channel_id: ChannelId::from(row.channel_id),
-                guild_id: row.guild_id.map(GuildId::from),
+                user_id: row.user_id,
+                channel_id: row.channel_id,
+                guild_id: row.guild_id,
             });
         }
 
@@ -112,14 +111,14 @@ impl Reminder {
             created_at: row.created_at,
             time: row.time,
             message: row.message,
-            user_id: UserId::from(row.user_id),
-            channel_id: ChannelId::from(row.channel_id),
-            guild_id: row.guild_id.map(GuildId::from),
+            user_id: row.user_id,
+            channel_id: row.channel_id,
+            guild_id: row.guild_id,
         })
     }
 
     /// Get all reminders for a user, given their user id.
-    pub async fn get_all_by_user_id(db: &MySqlPool, user_id: UserId) -> Result<Vec<Self>> {
+    pub async fn get_all_by_user_id(db: &MySqlPool, user_id: u64) -> Result<Vec<Self>> {
         let rows = sqlx::query!(
             r#"
             SELECT *
@@ -127,7 +126,7 @@ impl Reminder {
             WHERE user_id = ?
             ORDER BY time;
             "#,
-            i64::from(user_id),
+            user_id,
         )
         .fetch_all(db)
         .await?;
@@ -140,9 +139,9 @@ impl Reminder {
                 created_at: row.created_at,
                 time: row.time,
                 message: row.message,
-                user_id: UserId::from(row.user_id),
-                channel_id: ChannelId::from(row.channel_id),
-                guild_id: row.guild_id.map(GuildId::from),
+                user_id: row.user_id,
+                channel_id: row.channel_id,
+                guild_id: row.guild_id,
             });
         }
 
@@ -175,16 +174,14 @@ impl Reminder {
             created_at: row.created_at,
             time: row.time,
             message: row.message,
-            user_id: UserId::from(row.user_id),
-            channel_id: ChannelId::from(row.channel_id),
-            guild_id: row.guild_id.map(GuildId::from),
+            user_id: row.user_id,
+            channel_id: row.channel_id,
+            guild_id: row.guild_id,
         })
     }
 
     /// Delete all reminders for a user, given their user id.
-    pub async fn delete_all_by_user_id(db: &MySqlPool, user_id: UserId) -> Result<Self> {
-        let user_id = i64::from(user_id);
-
+    pub async fn delete_all_by_user_id(db: &MySqlPool, user_id: u64) -> Result<Self> {
         let row = sqlx::query!(
             r#"
             SELECT *
@@ -209,9 +206,9 @@ impl Reminder {
             created_at: row.created_at,
             time: row.time,
             message: row.message,
-            user_id: UserId::from(row.user_id),
-            channel_id: ChannelId::from(row.channel_id),
-            guild_id: row.guild_id.map(GuildId::from),
+            user_id: row.user_id,
+            channel_id: row.channel_id,
+            guild_id: row.guild_id,
         })
     }
 }

@@ -1,9 +1,9 @@
 use anyhow::{Context as _, Result};
 use chrono_tz::Tz;
 use serenity::{
-    all::CommandInteraction,
     builder::{CreateEmbed, CreateInteractionResponse, CreateInteractionResponseMessage},
     client::Context,
+    model::application::CommandInteraction,
 };
 use tyme_db::{Reminder, Timezone};
 
@@ -18,10 +18,10 @@ pub async fn run(ctx: Context, command: CommandInteraction) -> Result<()> {
             .clone()
     };
 
-    let reminders = Reminder::get_all_by_user_id(&db, command.user.id).await?;
+    let reminders = Reminder::get_all_by_user_id(&db, command.user.id.into()).await?;
 
     // get user's timezone
-    let timezone: Tz = Timezone::get(&db, command.user.id)
+    let timezone: Tz = Timezone::get(&db, command.user.id.into())
         .await
         .map_or_else(|_| Tz::UTC, |t| t.timezone);
 

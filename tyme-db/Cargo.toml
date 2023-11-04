@@ -8,27 +8,10 @@ rust-version = "1.65.0"
 anyhow = { version = "1.0.75", features = ["backtrace"] }
 chrono = "0.4.31"
 
-[dependencies.serenity]
-branch = "next"
-default-features = false
-features = [
-    "builder",
-    "cache",
-    "client",
-    "gateway",
-    "http",
-    "model",
-    "utils",
-    "rustls_backend",
-    "chrono",
-    "interactions_endpoint",
-]
-git = "https://github.com/serenity-rs/serenity"
-
 [dependencies.sqlx]
 features = ["runtime-tokio-rustls", "mysql", "macros", "migrate", "chrono"]
 version = "0.7.2"
 
 [dependencies.chrono-tz]
 features = ["std", "case-insensitive"]
-version = "0.8.3"
+version = "0.8.4"

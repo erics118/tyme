@@ -1,8 +1,8 @@
 use anyhow::{Context as _, Result};
 use serenity::{
-    all::CommandInteraction,
     builder::{CreateInteractionResponse, CreateInteractionResponseMessage},
     client::Context,
+    model::application::CommandInteraction,
 };
 use tyme_db::Timezone;
 
@@ -17,10 +17,12 @@ pub async fn run(ctx: Context, command: CommandInteraction) -> Result<()> {
             .clone()
     };
 
-    let res = Timezone::delete(&db, command.user.id).await.map_or_else(
-        |_| "No timezone is set.".to_string(),
-        |t| format!("Your timezone of `{}` has been deleted.", t.timezone),
-    );
+    let res = Timezone::delete(&db, command.user.id.into())
+        .await
+        .map_or_else(
+            |_| "No timezone is set.".to_string(),
+            |t| format!("Your timezone of `{}` has been deleted.", t.timezone),
+        );
 
     command
         .create_response(

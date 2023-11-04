@@ -2,9 +2,9 @@ use anyhow::{Context as _, Result};
 use chrono_tz::TZ_VARIANTS;
 use serenity::{
     self,
-    all::CommandInteraction,
     builder::{CreateAutocompleteResponse, CreateInteractionResponse},
     client::Context,
+    model::application::CommandInteraction,
 };
 
 use crate::{get_options, utils::fuzzy_autocomplete::fuzzy_autocomplete};

@@ -278,7 +278,7 @@ macro_rules! create_interaction_command_only_subcommands {
         use anyhow::{Context as _, Result};
         #[allow(unused)]
         use serenity::{
-            all::CommandInteraction,
+            model::application::CommandInteraction,
             builder::{CreateCommand, CreateCommandOption},
             client::Context,
             model::application::CommandOptionType,
@@ -355,7 +355,7 @@ macro_rules! create_command {
 #[macro_export]
 macro_rules! get_option_value {
     ($options:ident $index:tt $option_type:ident ) => { {
-        let serenity::all::ResolvedValue::$option_type(value) = &$options.get($index).context("missing option")?.value else {
+        let serenity::model::application::ResolvedValue::$option_type(value) = &$options.get($index).context("missing option")?.value else {
             anyhow::bail!("incorrect resolved option type")
         };
 
@@ -364,7 +364,7 @@ macro_rules! get_option_value {
     ($options:ident $index:tt . [Autocomplete] ) => { {
         let value = $crate::get_option_value!($options $index SubCommand);
 
-        let serenity::all::ResolvedValue::Autocomplete{value, kind} = &value.get($index).context("missing option")?.value else {
+        let serenity::model::application::ResolvedValue::Autocomplete{value, kind} = &value.get($index).context("missing option")?.value else {
             anyhow::bail!("incorrect resolved option type")
         };
 

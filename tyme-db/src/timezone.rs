@@ -2,14 +2,13 @@
 
 use anyhow::{Context, Result};
 use chrono_tz::Tz;
-use serenity::model::id::UserId;
 use sqlx::MySqlPool;
 
 /// Timezone struct.
 #[derive(Debug, Clone, Copy)]
 pub struct Timezone {
     /// The user's id.
-    pub user_id: UserId,
+    pub user_id: u64,
 
     /// The user's timezone.
     pub timezone: Tz,
@@ -17,14 +16,14 @@ pub struct Timezone {
 
 impl Timezone {
     /// Get a user's timezone, given their user id.
-    pub async fn get(db: &MySqlPool, user_id: UserId) -> Result<Self> {
+    pub async fn get(db: &MySqlPool, user_id: u64) -> Result<Self> {
         let row = sqlx::query!(
             r#"
             SELECT timezone
             FROM timezones
             WHERE user_id = ?;
             "#,
-            i64::from(user_id),
+            user_id,
         )
         .fetch_optional(db)
         .await?
@@ -45,7 +44,7 @@ impl Timezone {
             VALUES (?, ?)
             ON DUPLICATE KEY UPDATE timezone = VALUES(timezone);
             "#,
-            i64::from(self.user_id),
+            self.user_id,
             self.timezone.name(),
         )
         .execute(db)
@@ -55,13 +54,13 @@ impl Timezone {
     }
 
     /// Delete a user's timezone, given their user id.
-    pub async fn delete(db: &MySqlPool, user_id: UserId) -> Result<Self> {
+    pub async fn delete(db: &MySqlPool, user_id: u64) -> Result<Self> {
         let row = sqlx::query!(
             r#"
             SELECT * FROM timezones
             WHERE user_id = ?;
             "#,
-            i64::from(user_id),
+            user_id,
         )
         .fetch_one(db)
         .await?;
@@ -71,7 +70,7 @@ impl Timezone {
             DELETE FROM timezones
             WHERE user_id = ?;
             "#,
-            i64::from(user_id),
+            user_id,
         )
         .execute(db)
         .await?;
@@ -79,7 +78,7 @@ impl Timezone {
         let timezone = Tz::from_str_insensitive(&row.timezone)
             .map_err(|_| anyhow::anyhow!("database corrupted, timezone invalid"))?;
         Ok(Self {
-            user_id: row.user_id.into(),
+            user_id: row.user_id,
             timezone,
         })
     }

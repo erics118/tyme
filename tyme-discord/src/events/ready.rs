@@ -6,6 +6,7 @@ use serenity::{
     client::Context,
     gateway::ActivityData,
     http::CacheHttp,
+    model::id::{ChannelId, UserId},
     model::{
         gateway::{ActivityType, Ready},
         mention::Mentionable,
@@ -28,12 +29,12 @@ pub async fn notify_past_reminders(db: &MySqlPool, http: impl CacheHttp) -> Resu
 
         let message = format!(
             "Reminder for {}: {}\nSet {}",
-            r.user_id.mention(),
+            UserId::from(r.user_id).mention(),
             r.message,
             r.created_at.discord_timestamp(TimestampFormat::Relative),
         );
 
-        r.channel_id
+        ChannelId::from(r.channel_id)
             .send_message(&http, CreateMessage::new().content(message))
             .await?;
     }

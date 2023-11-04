@@ -2,9 +2,9 @@ use std::str::FromStr;
 
 use anyhow::{Context as _, Result};
 use serenity::{
-    all::CommandInteraction,
     builder::{CreateInteractionResponse, CreateInteractionResponseMessage},
     client::Context,
+    model::application::CommandInteraction,
 };
 use tyme_db::Reminder;
 
@@ -20,13 +20,13 @@ pub async fn run(ctx: Context, command: CommandInteraction) -> Result<()> {
 
     let Ok(id) = u32::from_str(id) else {
         command
-        .create_response(
-            &ctx.http,
-            CreateInteractionResponse::Message(
-                CreateInteractionResponseMessage::new().content("Invalid id format"),
-            ),
-        )
-        .await?;
+            .create_response(
+                &ctx.http,
+                CreateInteractionResponse::Message(
+                    CreateInteractionResponseMessage::new().content("Invalid id format"),
+                ),
+            )
+            .await?;
 
         return Ok(());
     };

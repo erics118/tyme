@@ -1,8 +1,8 @@
 use anyhow::Result;
 use serenity::{
-    all::CommandInteraction,
     builder::{CreateInteractionResponse, CreateInteractionResponseMessage},
     client::Context,
+    model::application::CommandInteraction,
 };
 
 use crate::create_command;

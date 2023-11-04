@@ -1,9 +1,9 @@
 use anyhow::{Context as _, Result};
 use chrono_tz::Tz;
 use serenity::{
-    all::CommandInteraction,
     builder::{CreateInteractionResponse, CreateInteractionResponseMessage},
     client::Context,
+    model::application::CommandInteraction,
 };
 use tyme_db::Timezone;
 
@@ -20,9 +20,7 @@ pub async fn run(ctx: Context, command: CommandInteraction) -> Result<()> {
                 .create_response(
                     &ctx.http,
                     CreateInteractionResponse::Message(CreateInteractionResponseMessage::new().content(
-                        format!(
-                            "Invalid timezone. You can find them here: <https://en.wikipedia.org/wiki/List_of_tz_database_time_zones>",
-                        ),
+                        "Invalid timezone. You can find them here: <https://en.wikipedia.org/wiki/List_of_tz_database_time_zones>".to_string(),
                     )),
                 )
                 .await?;
@@ -38,7 +36,7 @@ pub async fn run(ctx: Context, command: CommandInteraction) -> Result<()> {
     };
 
     let t = Timezone {
-        user_id: command.user.id,
+        user_id: command.user.id.into(),
         timezone,
     };
 

@@ -2,9 +2,9 @@ use anyhow::{Context as _, Result};
 use chrono::Utc;
 use chrono_tz::Tz;
 use serenity::{
-    all::CommandInteraction,
     builder::{CreateInteractionResponse, CreateInteractionResponseMessage},
     client::Context,
+    model::application::CommandInteraction,
 };
 use tyme_db::{Reminder, Timezone};
 
@@ -34,7 +34,7 @@ pub async fn run(ctx: Context, command: CommandInteraction) -> Result<()> {
     };
 
     // get user's timezone
-    let timezone: Tz = Timezone::get(&db, command.user.id)
+    let timezone: Tz = Timezone::get(&db, command.user.id.into())
         .await
         .map_or_else(|_| Tz::UTC, |t| t.timezone);
 
@@ -54,15 +54,15 @@ pub async fn run(ctx: Context, command: CommandInteraction) -> Result<()> {
         return Ok(());
     };
 
-    let Ok(now)  = now.checked_add(a) else {
+    let Ok(now) = now.checked_add(a) else {
         command
-        .create_response(
-            &ctx.http,
-            CreateInteractionResponse::Message(
-                CreateInteractionResponseMessage::new().content("Invalid time."),
-            ),
-        )
-        .await?;
+            .create_response(
+                &ctx.http,
+                CreateInteractionResponse::Message(
+                    CreateInteractionResponseMessage::new().content("Invalid time."),
+                ),
+            )
+            .await?;
 
         return Ok(());
     };
@@ -73,9 +73,9 @@ pub async fn run(ctx: Context, command: CommandInteraction) -> Result<()> {
         created_at: Utc::now().naive_utc(),
         time: now,
         message: description.to_string(),
-        user_id: command.user.id,
-        channel_id: command.channel_id,
-        guild_id: command.guild_id,
+        user_id: command.user.id.into(),
+        channel_id: command.channel_id.into(),
+        guild_id: command.guild_id.map(u64::from),
     };
 
     r.create(&db).await?;
