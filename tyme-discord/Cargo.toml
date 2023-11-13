@@ -10,7 +10,7 @@ tyme-db = { path = "../tyme-db" }
 anyhow = { version = "1.0.75", features = ["backtrace"] }
 chrono = "0.4.31"
 dotenvy = "0.15.7"
-env_logger = "0.10.0"
+env_logger = "0.10.1"
 fuzzy-matcher = "0.3.7"
 log = "0.4.20"
 paste = "1.0.14"
