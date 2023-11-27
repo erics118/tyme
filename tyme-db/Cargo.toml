@@ -10,7 +10,7 @@ chrono = "0.4.31"
 
 [dependencies.sqlx]
 features = ["runtime-tokio-rustls", "mysql", "macros", "migrate", "chrono"]
-version = "0.7.2"
+version = "0.7.3"
 
 [dependencies.chrono-tz]
 features = ["std", "case-insensitive"]
