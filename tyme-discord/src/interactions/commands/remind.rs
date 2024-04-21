@@ -1,18 +1,20 @@
 use anyhow::{Context as _, Result};
 use chrono::Utc;
-use chrono_tz::Tz;
 use serenity::{
     builder::{CreateInteractionResponse, CreateInteractionResponseMessage},
     client::Context,
     model::application::CommandInteraction,
 };
-use tyme_db::{Reminder, Timezone};
+use tyme_db::Reminder;
 
 use crate::{
     create_command,
     data::database::Database,
     get_options,
-    utils::human_time::{CheckedAddHumanTime, HumanTime},
+    utils::{
+        human_time::{CheckedAddHumanTime, HumanTime},
+        timestamp::{DiscordTimestamp, TimestampFormat},
+    },
 };
 
 create_command! {
@@ -33,12 +35,7 @@ pub async fn run(ctx: Context, command: CommandInteraction) -> Result<()> {
             .clone()
     };
 
-    // get user's timezone
-    let timezone: Tz = Timezone::get(&db, command.user.id.into())
-        .await
-        .map_or_else(|_| Tz::UTC, |t| t.timezone);
-
-    let now = Utc::now().naive_utc();
+    let now = command.id.created_at().naive_utc();
 
     // parse `when`
     let Ok(a) = HumanTime::parse(when) else {
@@ -81,12 +78,9 @@ pub async fn run(ctx: Context, command: CommandInteraction) -> Result<()> {
     r.create(&db).await?;
 
     let msg = format!(
-        "Reminder set for {} on **{}**",
+        "Reminder set for {} on {}",
         r.message,
-        r.time
-            .and_utc()
-            .with_timezone(&timezone)
-            .format("%h %e, %Y at %l:%M %p %Z"),
+        r.time.discord_timestamp(TimestampFormat::ShortDateTime)
     );
 
     command

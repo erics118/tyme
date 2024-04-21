@@ -34,11 +34,8 @@
     unused_lifetimes,
     unused_macro_rules,
     unused_qualifications,
-    unused_tuple_struct_fields,
+    dead_code,
     variant_size_differences,
-    explicit_outlives_requirements,
-    elided_lifetimes_in_paths,
-    unused_qualifications,
     clippy::all,
     clippy::nursery,
     clippy::expect_used,
@@ -48,6 +45,6 @@
 mod reminder;
 mod timezone;
 
-pub use sqlx::{mysql::MySqlPoolOptions, MySqlPool};
+pub use sqlx::{mysql::MySqlPoolOptions as PoolOptions, MySqlPool as Pool};
 
 pub use crate::{reminder::Reminder, timezone::Timezone};

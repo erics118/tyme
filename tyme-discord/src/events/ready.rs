@@ -6,14 +6,14 @@ use serenity::{
     client::Context,
     gateway::ActivityData,
     http::CacheHttp,
-    model::id::{ChannelId, UserId},
     model::{
         gateway::{ActivityType, Ready},
+        id::{ChannelId, UserId},
         mention::Mentionable,
     },
 };
 use tokio::time::{interval, Duration};
-use tyme_db::{MySqlPool, Reminder};
+use tyme_db::{Pool, Reminder};
 
 use crate::{
     data::database::Database,
@@ -21,7 +21,7 @@ use crate::{
 };
 
 /// Notify users of past reminders.
-pub async fn notify_past_reminders(db: &MySqlPool, http: impl CacheHttp) -> Result<()> {
+pub async fn notify_past_reminders(db: &Pool, http: impl CacheHttp) -> Result<()> {
     let reminders = Reminder::get_all_past_reminders(db).await?;
 
     for r in reminders {

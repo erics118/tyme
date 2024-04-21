@@ -10,10 +10,6 @@ use crate::messages::commands;
 
 /// Handle an message create event.
 pub async fn run(ctx: Context, message: Message) -> Result<()> {
-    if message.is_own(&ctx.cache) {
-        return Ok(());
-    }
-
     let mention = ctx.cache.current_user().mention().to_string();
 
     let owner_id = ctx

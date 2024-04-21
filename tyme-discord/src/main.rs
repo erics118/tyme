@@ -7,7 +7,6 @@
 #![warn(
     absolute_paths_not_starting_with_crate,
     elided_lifetimes_in_paths,
-    explicit_outlives_requirements,
     ffi_unwind_calls,
     keyword_idents,
     macro_use_extern_crate,
@@ -33,11 +32,8 @@
     unused_lifetimes,
     unused_macro_rules,
     unused_qualifications,
-    unused_tuple_struct_fields,
+    dead_code,
     variant_size_differences,
-    explicit_outlives_requirements,
-    elided_lifetimes_in_paths,
-    unused_qualifications,
     clippy::all,
     clippy::nursery,
     clippy::expect_used,
@@ -56,7 +52,7 @@ pub mod utils;
 use anyhow::{Context as _, Result};
 use dotenvy::dotenv;
 use serenity::{client::Client, model::gateway::GatewayIntents};
-use tyme_db::MySqlPoolOptions;
+use tyme_db::PoolOptions;
 
 use crate::{
     data::database::Database,
@@ -81,7 +77,7 @@ async fn main() -> Result<()> {
 
     log::info!("Connecting to database");
 
-    let db = MySqlPoolOptions::new()
+    let db = PoolOptions::new()
         .max_connections(50)
         .connect(&database_url)
         .await?;

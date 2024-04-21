@@ -52,7 +52,7 @@ impl DiscordTimestamp for NaiveDateTime {
         use TimestampFormat::*;
         format!(
             "<t:{}:{}>",
-            self.timestamp(),
+            self.and_utc().timestamp(),
             match t {
                 ShortTime => "t",
                 LongTime => "T",

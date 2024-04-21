@@ -2,16 +2,16 @@
 name = "tyme-db"
 version = "0.1.0"
 edition = "2021"
-rust-version = "1.65.0"
+rust-version = "1.74.0"
 
 [dependencies]
-anyhow = { version = "1.0.75", features = ["backtrace"] }
-chrono = "0.4.31"
+anyhow = { version = "1.0.82", features = ["backtrace"] }
+chrono = "0.4"
 
 [dependencies.sqlx]
-features = ["runtime-tokio-rustls", "mysql", "macros", "migrate", "chrono"]
-version = "0.7.2"
+features = [ "runtime-tokio", "tls-rustls", "mysql", "macros", "migrate", "chrono"]
+version = "0.7"
 
 [dependencies.chrono-tz]
 features = ["std", "case-insensitive"]
-version = "0.8.4"
+version = "0.9"

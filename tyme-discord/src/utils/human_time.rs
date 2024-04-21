@@ -170,23 +170,27 @@ impl CheckedAddHumanTime for NaiveDateTime {
 
         a = a
             .checked_add_months(Months::new(rhs.months + rhs.years * 12))
-            .context("checked add overflow")?;
+            .context("checked add overflow for months and years")?;
 
         a = a
             .checked_add_days(Days::new((rhs.days + rhs.weeks * 7).into()))
-            .context("checked add overflow")?;
+            .context("checked add overflow for days and weeks")?;
 
         a = a
             .checked_add_signed(Duration::hours(rhs.hours.into()))
-            .context("checked add overflow")?;
+            .context("checked add overflow for hours")?;
 
         a = a
             .checked_add_signed(Duration::minutes(rhs.minutes.into()))
-            .context("checked add overflow")?;
+            .context("checked add overflow for minutes")?;
 
         a = a
             .checked_add_signed(Duration::seconds(rhs.seconds.into()))
-            .context("checked add overflow")?;
+            .context("checked add overflow for seconds")?;
+
+        if a == self {
+            anyhow::bail!("zero time added");
+        }
 
         Ok(a)
     }
@@ -211,13 +215,7 @@ impl Display for HumanTime {
         // Filter out zero values, and pluralize the unit if necessary.
         let res = units
             .iter()
-            .filter_map(|(value, unit)| {
-                if *value > 0 {
-                    Some(pluralized(*value, unit))
-                } else {
-                    None
-                }
-            })
+            .map(|(value, unit)| pluralized(*value, unit))
             .collect::<Vec<_>>()
             .join(" ");
 
@@ -226,6 +224,7 @@ impl Display for HumanTime {
 }
 
 #[cfg(test)]
+#[allow(clippy::unwrap_used)]
 mod tests {
     use super::HumanTime;
 
@@ -342,6 +341,27 @@ mod tests {
     }
 
     #[test]
+    fn parse_zero_and_normal() {
+        assert_eq!(
+            HumanTime::parse("0day 1min").unwrap(),
+            HumanTime {
+                years: 0,
+                months: 0,
+                weeks: 0,
+                days: 0,
+                hours: 0,
+                minutes: 1,
+                seconds: 0,
+            }
+        );
+    }
+
+    #[test]
+    fn parse_err_zero() {
+        assert!(HumanTime::parse("0").is_err());
+    }
+
+    #[test]
     fn parse_err_simple() {
         assert!(HumanTime::parse("abc").is_err());
     }
@@ -362,7 +382,22 @@ mod tests {
     }
 
     #[test]
-    fn parse_err_mixed() {
+    fn parse_err_missing_token1() {
+        assert!(HumanTime::parse("3 min 7").is_err());
+    }
+
+    #[test]
+    fn parse_err_missing_token2() {
+        assert!(HumanTime::parse("min 7 sec").is_err());
+    }
+
+    #[test]
+    fn parse_err_overflow() {
+        assert!(HumanTime::parse("3 min 2131283123128397893782737 abc").is_err());
+    }
+
+    #[test]
+    fn parse_mixed() {
         assert_eq!(
             HumanTime::parse("3 min 7 abc").unwrap(),
             HumanTime {
@@ -375,11 +410,6 @@ mod tests {
                 seconds: 0,
             }
         );
-    }
-
-    #[test]
-    fn parse_err_overflow() {
-        assert!(HumanTime::parse("3 min 2131283123128397893782737 abc").is_err());
     }
 
     #[test]
