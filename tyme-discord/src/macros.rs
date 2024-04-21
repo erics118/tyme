@@ -284,7 +284,7 @@ macro_rules! create_interaction_command_only_subcommands {
             model::application::CommandOptionType,
         };
 
-        #[doc = "create the " $name " interaction command."]
+        #[doc = "Create the " $name " interaction command."]
         #[allow(unused)]
         pub fn register() -> CreateCommand {
             let mut c = CreateCommand::new(stringify!($name))
@@ -302,7 +302,7 @@ macro_rules! create_interaction_command_only_subcommands {
             return c;
         }
 
-        /// Handle the timezone command.
+        #[doc = "Handle the" $name " command."]
         pub async fn run(ctx: Context, command: CommandInteraction) -> Result<()> {
             let o = command.data.options();
 

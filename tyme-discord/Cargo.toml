@@ -6,7 +6,6 @@ rust-version = "1.74.0"
 
 [dependencies]
 tyme-db = { path = "../tyme-db" }
-
 anyhow = { version = "1.0.82", features = ["backtrace"] }
 chrono = "0.4"
 dotenvy = "0.15"
