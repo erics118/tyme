@@ -22,8 +22,8 @@ alias f := fmt
 fmt:
     cargo fmt --all
 
-alias c := check
-check: fmt clippy test
-
 clippy:
     cargo clippy --all --all-targets --all-features
+
+alias c := check
+check: fmt clippy test

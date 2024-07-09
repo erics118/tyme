@@ -75,7 +75,7 @@ macro_rules! interaction_commands {
         /// Function to register all interaction commands.
         ///
         /// Adding the Send + Sync traits fixes the clippy::future_not_send diagnostic.
-        pub async fn register_all(http: impl AsRef<Http> + Send + Sync)  -> Result<()> {
+        pub async fn register_all(http: impl AsRef<Http> + Send + Sync) -> Result<()> {
             let _ = Command::set_global_commands(
                 http,
                 vec![
@@ -147,12 +147,8 @@ macro_rules! create_extra_basic_option {
 /// ```
 #[macro_export]
 macro_rules! create_basic_option {
-    ($option_type:tt $option_name:ident $option_description:literal) => {
+    ($option_type:ident $option_name:ident $option_description:literal) => {
         $crate::create_extra_basic_option!($option_type $option_name $option_description)
-    };
-    ($option_type:ident $option_name:ident $option_description:literal optional) => {
-        $crate::create_extra_basic_option!($option_type $option_name $option_description)
-            .required(false)
     };
     ($option_type:ident $option_name:ident $option_description:literal required) => {
         $crate::create_extra_basic_option!($option_type $option_name $option_description)
@@ -160,11 +156,6 @@ macro_rules! create_basic_option {
     };
     ($option_type:ident $option_name:ident $option_description:literal autocomplete) => {
         $crate::create_extra_basic_option!($option_type $option_name $option_description)
-            .set_autocomplete(true)
-    };
-    ($option_type:ident $option_name:ident $option_description:literal optional autocomplete) => {
-        $crate::create_extra_basic_option!($option_type $option_name $option_description)
-            .required(false)
             .set_autocomplete(true)
     };
     ($option_type:ident $option_name:ident $option_description:literal required autocomplete) => {
