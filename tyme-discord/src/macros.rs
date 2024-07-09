@@ -120,51 +120,6 @@ macro_rules! interaction_autocompletes {
     } };
 }
 
-/// Create an extra basic option
-///
-/// Format:
-/// ```
-/// create_extra_basic_option!(String name "Description")
-/// ```
-#[macro_export]
-macro_rules! create_extra_basic_option {
-    (
-        $option_type:ident $option_name:ident $option_description:literal
-    ) => {
-        CreateCommandOption::new(
-            CommandOptionType::$option_type,
-            stringify!($option_name),
-            $option_description,
-        )
-    };
-}
-
-/// Create a basic option
-///
-/// Format:
-/// ```
-/// create_basic_option!(String name "Description" [optional/required] [autocomplete])
-/// ```
-#[macro_export]
-macro_rules! create_basic_option {
-    ($option_type:ident $option_name:ident $option_description:literal) => {
-        $crate::create_extra_basic_option!($option_type $option_name $option_description)
-    };
-    ($option_type:ident $option_name:ident $option_description:literal required) => {
-        $crate::create_extra_basic_option!($option_type $option_name $option_description)
-            .required(true)
-    };
-    ($option_type:ident $option_name:ident $option_description:literal autocomplete) => {
-        $crate::create_extra_basic_option!($option_type $option_name $option_description)
-            .set_autocomplete(true)
-    };
-    ($option_type:ident $option_name:ident $option_description:literal required autocomplete) => {
-        $crate::create_extra_basic_option!($option_type $option_name $option_description)
-            .required(true)
-            .set_autocomplete(true)
-    };
-}
-
 /// Create an option
 ///
 /// Format:
@@ -176,16 +131,41 @@ macro_rules! create_basic_option {
 /// ```
 #[macro_export]
 macro_rules! create_option {
+    // Helper macro to add attributes to a simple option
+    (@add_attrs $opt:expr, ) => { $opt };
+    (@add_attrs $opt:expr, optional $($rest:tt)*) => {
+        $crate::create_option!(@add_attrs $opt.required(false), $($rest)*)
+    };
+    (@add_attrs $opt:expr, required $($rest:tt)*) => {
+        $crate::create_option!(@add_attrs $opt.required(true), $($rest)*)
+    };
+    (@add_attrs $opt:expr, autocomplete $($rest:tt)*) => {
+        $crate::create_option!(@add_attrs $opt.set_autocomplete(true), $($rest)*)
+    };
+
+    // Simple option without suboptions
+    (@simple_option $option_type:ident $option_name:ident $option_description:literal $($attrs:tt)*) => {
+        {
+            let opt = CreateCommandOption::new(
+                CommandOptionType::$option_type,
+                stringify!($option_name),
+                $option_description,
+            );
+            $crate::create_option!(@add_attrs opt, $($attrs)*)
+        }
+    };
+
+    // Main macro entry point
     (
         $option_type:ident $option_name:ident $option_description:literal $($option_other:ident)*
         $(
             >> $suboption_type:ident $suboption_name:ident $suboption_description:literal $($suboption_other:ident)*
         )*
     ) => {
-        $crate::create_basic_option!($option_type $option_name $option_description $($option_other)*)
+        $crate::create_option!(@simple_option $option_type $option_name $option_description $($option_other)*)
         $(
             .add_sub_option(
-                $crate::create_basic_option!($suboption_type $suboption_name $suboption_description $($suboption_other)*)
+                $crate::create_option!(@simple_option $suboption_type $suboption_name $suboption_description $($suboption_other)*)
             )
         )*
     };
@@ -197,17 +177,24 @@ macro_rules! create_option {
 ///
 /// ```
 /// create_interaction_command!(
-///    name
-///   | "Description"
+///     / name
+///     | "Description"
 ///    > String option_name "Description" [optional/required] [autocomplete]
 ///    >> String suboption_name "Description" [optional/required] [autocomplete]
 ///    > String another_option_name "Description" [optional/required] [autocomplete]
 /// )
+///
+/// create_interaction_command!(
+///     / name
+///     + subcmd "Description"
+///     >> String option_name "Description" [optional/required] [autocomplete]
+///     + another_subcmd "Description"
+/// )
 /// ```
 #[macro_export]
-macro_rules! create_interaction_command_no_subcommands {
+macro_rules! create_command {
     (
-        $name:ident
+        / $name:ident
         | $description:literal
         $(
             > $option_type:ident $option_name:ident $option_description:literal $($option_other:ident)*
@@ -240,23 +227,9 @@ macro_rules! create_interaction_command_no_subcommands {
             return c;
         }
     } };
-}
 
-/// Create interaction command with only subcommands
-///
-/// Format:
-///
-/// ```
-/// create_interaction_command_only_subcommands!(
-///     name
-///     + option_name "Description"
-///     >> String suboption_name "Description"
-///     + another_option_name "Description"
-/// )
-#[macro_export]
-macro_rules! create_interaction_command_only_subcommands {
     (
-        $name:ident
+        / $name:ident
         $(
             + $option_name:ident $option_description:literal
             $(
@@ -264,7 +237,6 @@ macro_rules! create_interaction_command_only_subcommands {
             )*
         )+
     ) => { paste::paste! {
-
         #[allow(unused)]
         use anyhow::{Context as _, Result};
         #[allow(unused)]
@@ -308,38 +280,7 @@ macro_rules! create_interaction_command_only_subcommands {
 
             Ok(())
         }
-
     } };
-}
-
-/// Create interaction command macro
-///
-/// Format:
-///
-/// ```
-/// create_interaction_command!(
-///     / name
-///     | "Description"
-///    > String option_name "Description" [optional/required] [autocomplete]
-///    >> String suboption_name "Description" [optional/required] [autocomplete]
-///    > String another_option_name "Description" [optional/required] [autocomplete]
-/// )
-///
-/// create_interaction_command!(
-///     / name
-///     + subcmd "Description"
-///     >> String option_name "Description" [optional/required] [autocomplete]
-///     + another_subcmd "Description"
-/// )
-/// ```
-#[macro_export]
-macro_rules! create_command {
-    ( / $name:ident | $($other:tt)+ ) => {
-        $crate::create_interaction_command_no_subcommands!($name | $($other)+);
-    };
-    ( / $name:ident + $($other:tt)+ ) => {
-        $crate::create_interaction_command_only_subcommands!($name + $($other)+);
-    }
 }
 
 /// Get the value from an option.
@@ -378,7 +319,7 @@ macro_rules! get_option_value {
 }
 
 /// Get an option from a command.
-/// TODO: support subsubcommands
+/// TODO: support subcommand groups
 #[macro_export]
 macro_rules! get_options {
     (
