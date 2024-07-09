@@ -6,20 +6,20 @@ rust-version = "1.74.0"
 
 [dependencies]
 tyme-db = { path = "../tyme-db" }
-anyhow = { version = "1.0.82", features = ["backtrace"] }
+anyhow = { version = "1.0", features = ["backtrace"] }
 chrono = "0.4"
 dotenvy = "0.15"
 env_logger = "0.11"
 fuzzy-matcher = "0.3"
 log = "0.4"
 paste = "1.0"
-tokio = { version = "1.37", features = ["full"] }
+tokio = { version = "1.38", features = ["full"] }
 
 [dependencies.serenity]
 default-features = false
 features = ["builder", "cache", "client", "gateway", "model", "utils", "rustls_backend", "chrono", "simd_json"]
 git = "https://github.com/serenity-rs/serenity"
-rev = "5668654"
+rev = "094b28f"
 
 [dependencies.chrono-tz]
 features = ["std", "case-insensitive"]

@@ -5,7 +5,7 @@ edition = "2021"
 rust-version = "1.74.0"
 
 [dependencies]
-anyhow = { version = "1.0.82", features = ["backtrace"] }
+anyhow = { version = "1.0", features = ["backtrace"] }
 chrono = "0.4"
 
 [dependencies.sqlx]
