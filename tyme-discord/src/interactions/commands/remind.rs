@@ -18,10 +18,9 @@ use crate::{
 };
 
 create_command! {
-    / remind
-    | "Remind you about something"
-    > String when "When to remind you" required
-    > String message "What to remind you about" required
+    / remind "Remind you about something"
+        > String when "When to remind you" required
+        > String message "What to remind you about" required
 }
 
 /// Handle the remind command.
