@@ -18,7 +18,8 @@ use crate::{
 };
 
 create_command! {
-    / remind "Remind you about something"
+    / remind
+    | "Remind you about something"
         > String when "When to remind you" required
         > String message "What to remind you about" required
 }

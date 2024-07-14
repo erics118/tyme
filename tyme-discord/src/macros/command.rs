@@ -4,27 +4,44 @@
 ///
 /// ```
 /// create_option!(
-///     String name "Description" [optional/required] [autocomplete]
+///     String name "Description" [attrs]
 /// )
 ///
 /// create_option!(
-///     SubCommand subcmd
-///     > String suboption "Description" [optional/required] [autocomplete]
+///     subcmd "Description"
+///         > String suboption "Description" [attrs]
+/// )
+///
+/// create_option!(
+///     subcmdgroup
+///         + subcmd "Description"
+///             > String suboption "Description" [attrs]
 /// )
 /// ```
 #[macro_export]
 macro_rules! create_option {
     // Helper macro to add attributes to a simple option
     (@add_attrs $opt:expr, ) => { $opt };
+
     (@add_attrs $opt:expr, optional $($rest:tt)*) => {
         $crate::create_option!(@add_attrs $opt.required(false), $($rest)*)
     };
+
     (@add_attrs $opt:expr, required $($rest:tt)*) => {
         $crate::create_option!(@add_attrs $opt.required(true), $($rest)*)
     };
+
     (@add_attrs $opt:expr, autocomplete $($rest:tt)*) => {
         $crate::create_option!(@add_attrs $opt.set_autocomplete(true), $($rest)*)
     };
+
+    // (@add_attrs $opt:expr, min_length($min_length:tt) $($rest:tt)*) => {
+    //     $crate::create_option!(@add_attrs $opt.min_length($min_length), $($rest)*)
+    // };
+
+    // (@add_attrs $opt:expr, max_length $max_length:tt $($rest:tt)*) => {
+    //     $crate::create_option!(@add_attrs $opt.max_length($max_length), $($rest)*)
+    // };
 
     // Simple option without suboptions
     (@simple_option $option_type:ident $option_name:ident $option_description:literal $($attrs:tt)*) => {
@@ -111,7 +128,8 @@ macro_rules! create_option {
 #[macro_export]
 macro_rules! create_command {
     (
-        / $name:ident $description:literal
+        / $name:ident
+        | $description:literal
         $(
             > $option_type:ident $option_name:ident $option_description:literal $($option_attrs:ident)*
         )*
@@ -192,7 +210,7 @@ macro_rules! create_command {
     } };
 
     (
-        /! $name:ident
+        / $name:ident
         $(
             - $subcmdgroup_name:ident
             $(

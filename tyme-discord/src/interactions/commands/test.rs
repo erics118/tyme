@@ -1,7 +1,7 @@
 use crate::create_command;
 
 create_command! {
-    /! test
+    / test
         - subcmdgroup1
             + subcmd11 "subcmd 11 desc"
                 > String val "Phrase" required
