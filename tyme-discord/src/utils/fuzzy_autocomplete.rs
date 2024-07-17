@@ -1,17 +1,16 @@
 //! Utility functions for fuzzy autocomplete.
 
-use anyhow::Result;
 use fuzzy_matcher::{skim::SkimMatcherV2, FuzzyMatcher};
-use serenity::{self, builder::AutocompleteChoice};
 
 /// Returns a list of autocomplete choices based on a fuzzy search.
-pub fn fuzzy_autocomplete(cur: &str, values: &[&str]) -> Result<Vec<AutocompleteChoice>> {
+pub fn fuzzy_autocomplete<T: ToString + Copy + Clone>(cur: &str, values: &[T]) -> Vec<T> {
     let matcher = SkimMatcherV2::default().ignore_case();
 
     let mut matches = Vec::new();
 
-    for v in values.iter() {
-        if let Some((score, _)) = matcher.fuzzy_indices(v, cur) {
+    for v in values.iter().rev() {
+        let v_str = v.to_string();
+        if let Some((score, _)) = matcher.fuzzy_indices(&v_str, cur) {
             matches.push((score, v));
         }
     }
@@ -19,11 +18,11 @@ pub fn fuzzy_autocomplete(cur: &str, values: &[&str]) -> Result<Vec<Autocomplete
     matches.sort_by_key(|(score, _)| *score);
     matches.reverse();
 
-    let mut choices = Vec::<AutocompleteChoice>::new();
+    let mut choices = Vec::<T>::new();
 
     for (_, v) in matches.iter().take(25) {
-        choices.push(AutocompleteChoice::new(v.to_string(), v.to_string()));
+        choices.push(**v);
     }
 
-    Ok(choices)
+    choices
 }

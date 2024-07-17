@@ -3,61 +3,38 @@
 //! starting the bot and connecting to the database.
 
 #![forbid(unsafe_code)]
-#![feature(stmt_expr_attributes)]
 #![warn(
     absolute_paths_not_starting_with_crate,
-    elided_lifetimes_in_paths,
-    ffi_unwind_calls,
-    keyword_idents,
-    macro_use_extern_crate,
-    meta_variable_misuse,
-    missing_abi,
-    missing_copy_implementations,
-    missing_debug_implementations,
-    missing_docs,
-    non_ascii_idents,
-    noop_method_call,
-    rust_2021_incompatible_closure_captures,
-    rust_2021_incompatible_or_patterns,
-    rust_2021_prefixes_incompatible_syntax,
-    rust_2021_prelude_collisions,
-    single_use_lifetimes,
-    trivial_casts,
-    trivial_numeric_casts,
-    unsafe_op_in_unsafe_fn,
-    unused_crate_dependencies,
-    unused_extern_crates,
-    unused_import_braces,
-    unused_lifetimes,
-    unused_macro_rules,
     unused_qualifications,
     dead_code,
-    variant_size_differences,
     clippy::all,
-    clippy::nursery,
     clippy::expect_used,
     clippy::unwrap_used
 )]
 
-pub mod data;
-pub mod events;
-pub mod handler;
-pub mod interactions;
-pub mod macros;
-pub mod messages;
 pub mod setup;
 pub mod utils;
 
+use std::time::Duration;
+
 use anyhow::{Context as _, Result};
 use dotenvy::dotenv;
-use serenity::{client::Client, model::gateway::GatewayIntents};
-use tyme_db::PoolOptions;
-
-use crate::{
-    data::database::Database,
-    handler::Handler,
-    setup::{get_database_url, get_discord_token, setup_logger},
+use event_loop::notify_past_reminders;
+use poise::{
+    serenity_prelude::{ActivityData, ActivityType, Client, GatewayIntents},
+    FrameworkOptions, PrefixFrameworkOptions,
 };
+use tokio::{sync::Mutex, time::interval};
+use tyme_db::PoolOptions;
+use types::*;
+
+use crate::setup::{get_database_url, get_discord_token, setup_logger};
+
+pub mod types;
+
+pub mod commands;
+pub mod event_loop;
+pub mod macros;
 
 #[tokio::main]
 async fn main() -> Result<()> {
@@ -71,6 +48,26 @@ async fn main() -> Result<()> {
         log::info!("Not using .env file");
     }
 
+    // FrameworkOptions contains all of poise's configuration option in one struct
+    // Every option can be omitted to use its default value
+    let options = FrameworkOptions {
+        commands: commands::all(),
+        prefix_options: PrefixFrameworkOptions {
+            mention_as_prefix: true,
+            ..Default::default()
+        },
+        skip_checks_for_owners: true,
+        pre_command: move |ctx| {
+            Box::pin(async move {
+                log::trace!(
+                    "Received interaction command: {}",
+                    ctx.command().qualified_name
+                );
+            })
+        },
+        ..Default::default()
+    };
+
     // start database
     let database_url = get_database_url().context("Unable to get database URL")?;
 
@@ -83,17 +80,47 @@ async fn main() -> Result<()> {
 
     log::info!("Database connection successful");
 
-    // start discord bot
+    let framework = poise::Framework::builder()
+        .setup(move |ctx, ready, _framework| {
+            Box::pin(async move {
+                log::info!("Bot connected as: {}", ready.user.name);
+
+                ctx.set_activity(Some(ActivityData {
+                    name: "eirk".to_string(),
+                    kind: ActivityType::Listening,
+                    state: None,
+                    url: None,
+                }));
+
+                log::trace!("Set status");
+
+                let http = ctx.http.clone();
+                let db2 = db.clone();
+
+                // Start a task to notify users of past reminders every minute
+                tokio::spawn(async move {
+                    let mut interval = interval(Duration::from_secs(60));
+
+                    loop {
+                        interval.tick().await;
+
+                        if let Err(e) = notify_past_reminders(&db2, &http).await {
+                            log::error!("Failed to notify past reminders: {:#?}", e);
+                        }
+                    }
+                });
+
+                Ok(Data { db: Mutex::new(db) })
+            })
+        })
+        .options(options)
+        .build();
+
     let token = get_discord_token().context("Unable to get bot token")?;
 
-    let mut client = Client::builder(
-        token,
-        GatewayIntents::GUILD_MESSAGES | GatewayIntents::MESSAGE_CONTENT,
-    )
-    .event_handler(Handler)
-    .type_map_insert::<Database>(db)
-    .await
-    .context("Error creating client")?;
+    let mut client = Client::builder(token, GatewayIntents::non_privileged())
+        .framework(framework)
+        .await?;
 
     client.start().await?;
 

@@ -149,7 +149,7 @@ impl Reminder {
     }
 
     /// Delete a single reminder given its id.
-    pub async fn delete_one_by_id(db: &MySqlPool, id: u32) -> Result<Self> {
+    pub async fn delete_one_by_id(db: &MySqlPool, id: u64) -> Result<Self> {
         let row = sqlx::query!(
             r#"
             SELECT *

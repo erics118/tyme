@@ -14,13 +14,5 @@ fuzzy-matcher = "0.3"
 log = "0.4"
 paste = "1.0"
 tokio = { version = "1.38", features = ["full"] }
-
-[dependencies.serenity]
-default-features = false
-features = ["builder", "cache", "client", "gateway", "model", "utils", "rustls_backend", "chrono", "simd_json"]
-git = "https://github.com/serenity-rs/serenity"
-rev = "094b28f"
-
-[dependencies.chrono-tz]
-features = ["std", "case-insensitive"]
-version = "0.9"
+poise = "0.6.1"
+futures = "0.3.30"
